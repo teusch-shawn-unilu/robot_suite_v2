@@ -1,0 +1,27 @@
+landmark_detector_node:
+  ros__parameters:
+    standalone: false
+    tick_rate: 30 # Hz
+    img_input_topic: "/camera/image_raw"
+    landmarks_topic: "/hand/landmarks"
+    num_hands: 2
+    min_detection_confidence: 0.8
+    min_tracking_confidence: 0.5
+
+landmark_annotator_node:
+  ros__parameters:
+    img_input_topic: "/camera/image_raw"
+    landmarks_topic: "/hand/landmarks"
+    annotated_img_topic: "/hand/annotated/image"
+
+face_detector_node:
+  ros__parameters:
+    # PluginBase Parameters
+    standalone: false
+    tick_rate: 30 # Hz
+
+face_estimator_node:
+  ros__parameters:
+    # PluginBase Parameters
+    standalone: true
+    tick_rate: 30 # Hz
