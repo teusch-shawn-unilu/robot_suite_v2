@@ -28,5 +28,5 @@ jobs:
       - name: Build ROS 2 package
         uses: ros-tooling/action-ros-ci@v0.3
         with:
-          package-name: tello_app tello_bringup tello_bt tello_description tello_driver tello_msgs tello_nav # Add plugins too
+          # package-name:  tello_bringup tello_bt tello_driver tello_msgs # tello_description tello_nav tello_app Add plugins too
           target-ros2-distro: foxy
