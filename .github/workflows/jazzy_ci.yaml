@@ -24,6 +24,6 @@ jobs:
       - name: Build ROS 2 package
         uses: ros-tooling/action-ros-ci@v0.3
         with:
-          package-name: tello_driver
+          package-name: tello_suite
           target-ros2-distro: jazzy
 
