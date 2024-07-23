@@ -27,5 +27,5 @@ jobs:
       - name: Build ROS 2 package
         uses: ros-tooling/action-ros-ci@v0.3
         with:
-          package-name: "*"
+          package-name: tello_driver
           target-ros2-distro: humble
