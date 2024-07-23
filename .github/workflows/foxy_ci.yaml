@@ -3,7 +3,7 @@ name: Foxy CI
 on:
   push:
     branches:
-      - foxy
+      - main 
 
 jobs:
   build:
