@@ -17,7 +17,7 @@ RUN pip install .
 WORKDIR /tmp
 RUN rm -rf tellopy
 
-RUN pip install av
+RUN pip install av pillow
 
 
 WORKDIR /workspace/src
@@ -28,5 +28,5 @@ COPY ./tello_msgs/ ./tello_msgs
 WORKDIR /workspace
 RUN . /opt/ros/humble/setup.sh && colcon build
 
-RUN echo "source /opt/ros/humble/setup.bash" >> ~.bashrc
-RUN echo "source /workspace/install/setup.bash" >> ~.bashrc
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+RUN echo "source /workspace/install/setup.bash" >> ~/.bashrc
