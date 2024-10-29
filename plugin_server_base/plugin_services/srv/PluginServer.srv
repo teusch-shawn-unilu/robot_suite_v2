@@ -1,0 +1,6 @@
+# Request
+bool tick # Tick the Node should always be true (Not used)
+---
+# Result
+uint8 node_state # 0 - FAILURE | 1 - RUNNING | 2 - SUCCESS 
+

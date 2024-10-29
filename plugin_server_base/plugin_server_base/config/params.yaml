@@ -1,0 +1,5 @@
+/**:
+  ros__parameters:
+    tick_rate: 30 # Hz
+    standalone: false # Set to true if desired to just run the plugin as a normal node
+
