@@ -14,9 +14,7 @@ def create_hand_tracker_plugin_launch() -> IncludeLaunchDescription:
     hand_tracker_pck_dir = get_package_share_directory("hand_gestures")
     return IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(
-                hand_tracker_pck_dir, "launch/hand_gestures_launch.py"
-            )
+            os.path.join(hand_tracker_pck_dir, "launch/hand_gestures_launch.py")
         ),
         launch_arguments={
             "params_file": params_file,
@@ -39,9 +37,7 @@ def create_face_tracker_plugin_launch() -> IncludeLaunchDescription:
     hand_tracker_pck_dir = get_package_share_directory("face_tracker_plugin")
     return IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(
-                hand_tracker_pck_dir, "launch/face_tracker_plugin_launch.py"
-            )
+            os.path.join(hand_tracker_pck_dir, "launch/face_tracker_plugin_launch.py")
         ),
         launch_arguments={"params_file": params_file}.items(),
     )
@@ -61,10 +57,7 @@ def create_tello_driver_launch() -> IncludeLaunchDescription:
 def create_tello_bt_launch() -> Node:
     pkg_dir = get_package_share_directory("tello_bringup")
     params_file = os.path.join(pkg_dir, "config", "params.yaml")
-    # tello_driver_pkg_dir = get_package_share_directory("tello_bt_server")
-    return Node(
-        package="tello_bt_server", executable="tello_bt_node", output="screen"
-    )
+    return Node(package="tello_bt", executable="bt_server", output="screen")
 
 
 def create_tello_control_station_launch() -> Node:
@@ -83,7 +76,7 @@ def generate_launch_description():
 
     ld.add_action(create_hand_tracker_plugin_launch())
     ld.add_action(create_tello_sign_interpreter())
-    ld.add_action(create_face_tracker_plugin_launch())
+    # ld.add_action(create_face_tracker_plugin_launch())
     ld.add_action(create_tello_driver_launch())
     ld.add_action(create_tello_bt_launch())
     ld.add_action(create_tello_control_station_launch())
