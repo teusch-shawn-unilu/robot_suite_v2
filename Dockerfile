@@ -17,14 +17,11 @@ WORKDIR /tmp
 RUN rm -rf tellopy
 
 # Install PIP libaries
-RUN pip install av pillow py-trees
+RUN pip install av pillow py-trees mediapipe
 
 # Copy Tello Suite
 WORKDIR /workspace/src
-COPY ./tello_suite/ ./tello_suite
-COPY ./tello_driver/ ./tello_driver
-COPY ./tello_msgs/ ./tello_msgs
-COPY ./tello_plugins/ ./tello_plugins
+COPY . .
 
 # Colcon build + source
 WORKDIR /workspace
