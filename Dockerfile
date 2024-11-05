@@ -17,7 +17,7 @@ WORKDIR /tmp
 RUN rm -rf tellopy
 
 # Install PIP libaries
-RUN pip install av pillow py-trees mediapipe
+RUN pip install av pillow py-trees mediapipe pygame
 
 # Copy Tello Suite
 WORKDIR /workspace/src
