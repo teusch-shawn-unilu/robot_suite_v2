@@ -21,4 +21,4 @@ The following parameters can be configured in the `plugin_server_base` package:
 | Parameter Name | Default Value | Description                                                                                           |
 | -------------- | ------------- | ----------------------------------------------------------------------------------------------------- |
 | `tick_rate`    | 30            | When in standalone mode, this parameter sets the rate (in Hz) at which the `tick()` method is called. |
-| `standalone`   | true          | If set to `true`, the plugin runs in standalone mode, meaning it operates without the behavior tree.  |
+| `standalone`   | false          | If set to `true`, the plugin runs in standalone mode, meaning it operates without the behavior tree.  |
