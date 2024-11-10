@@ -7,10 +7,7 @@
   <maintainer email="pmbs.123@gmail.com">pedros235</maintainer>
   <license>GPL-3.0</license>
 
-  <test_depend>ament_copyright</test_depend>
-  <test_depend>ament_flake8</test_depend>
-  <test_depend>ament_pep257</test_depend>
-  <test_depend>python3-pytest</test_depend>
+  <depend>cv-bridge</depend>
 
   <export>
     <build_type>ament_python</build_type>
