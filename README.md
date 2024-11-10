@@ -8,7 +8,7 @@ Tello Suite is a collection of ROS2 packages designed to enhance the intelligenc
 
 At its core is `tello_bt`, a behavior tree that orchestrates all components by defining behaviors. This makes the system more robust, allowing you to control which plugins should run and making it more reliable in case of unexpected events.
 
-The suite also includes a `Dockerfile` for easy setup without needing local installation. For more information, see the [Docker](#whale-docker) section.
+The suite also includes a `Dockerfile` for easy setup without needing local installation. For more information, see the [Docker](#docker) section.
 
 ---
 
