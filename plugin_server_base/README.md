@@ -14,6 +14,25 @@ Using this package is straightforward and requires only two steps:
 > [!NOTE]
 > The `tick()` method functions like a loop, either called by the behavior tree or, if in standalone mode, called at a default rate of 30 Hz.
 
+## Usage
+
+We offer a simple plugin tester node, which is targeted for developers to test for example their behavior tree.
+The node name is `test_plugin_node` and it can be executed with:
+
+```sh
+ros2 run plugin_server_base test_plugin
+```
+
+> [!TIP]
+> In case you want to test your plugin while in development, you can run it
+> in standalone mode.
+
+In order to use the plugin in standalone mode, you can run the following command:
+
+```sh
+ros2 run plugin_server_base test_plugin --ros-args -p standalone:=true -p tick_rate:=30
+```
+
 ## Parameters
 
 The following parameters can be configured in the `plugin_server_base` package:
@@ -21,4 +40,4 @@ The following parameters can be configured in the `plugin_server_base` package:
 | Parameter Name | Default Value | Description                                                                                           |
 | -------------- | ------------- | ----------------------------------------------------------------------------------------------------- |
 | `tick_rate`    | 30            | When in standalone mode, this parameter sets the rate (in Hz) at which the `tick()` method is called. |
-| `standalone`   | false          | If set to `true`, the plugin runs in standalone mode, meaning it operates without the behavior tree.  |
+| `standalone`   | false         | If set to `true`, the plugin runs in standalone mode, meaning it operates without the behavior tree.  |
