@@ -1,3 +1,4 @@
+import inspect
 from abc import abstractmethod
 from typing import Any, Optional, overload
 from rclpy.node import Node
@@ -94,12 +95,18 @@ class PluginBase(Node):
         # This way, if the node fails, the BT will now and start its fallback
         # procedure
 
-        self.get_logger().debug(
-            "Plugin <{self.plugin_name}> has been requested to be ticked"
-        )
         blackboard = self._deserialize_blackboard(request.blackboard)
 
-        status = self.tick(blackboard)
+        self.get_logger().error(
+            f"Parameter signature: {inspect.signature(self.tick).parameters}"
+        )
+        if len(inspect.signature(self.tick).parameters) == 0:
+            # self.get_logger().warning(
+            #     'tick() will be deprecated. Please change your tick method signature to <def tick(self, blackboard: Optional[dict["str", Any]] = None)>',
+            # )
+            status = self.tick()
+        else:
+            status = self.tick(blackboard)
 
         self.get_logger().debug(f"Plugin <{self.plugin_name}> status: {status}")
 
