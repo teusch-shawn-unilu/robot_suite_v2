@@ -1,4 +1,4 @@
-from tello_bt.actions.action import Action
+from tello_bt.nodes.actions.action import Action
 import py_trees
 
 from std_msgs.msg import String
@@ -9,7 +9,7 @@ class RemoteOperator(Action):
 
     def setup(self) -> None:  # type: ignore
         self.key_pressed = ""
-        self.battery_sub = self.node.create_subscription(
+        self.key_press_sub = self.node.create_subscription(
             String, self.keyboard_topic, self.key_pressed_callback, 1
         )
 

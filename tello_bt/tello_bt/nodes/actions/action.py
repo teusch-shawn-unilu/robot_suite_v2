@@ -1,10 +1,5 @@
 import py_trees
-from plugin_services.srv import PluginServer
 from rclpy.node import Node
-from rclpy.client import Client
-from rclpy.logging import rclpy
-
-STATUS_MAP = ["FAILURE", "RUNNING", "SUCCESS"]
 
 
 class Action(py_trees.behaviour.Behaviour):

@@ -1,22 +1,19 @@
 import py_trees
 import typing
 from rclpy.node import Node
-from tello_bt.actions.remote_operator import RemoteOperator
-from tello_bt.actions.is_battery_low import IsBatteryLow
-from tello_bt.plugin_client import PluginClient
+from tello_bt.nodes.actions.remote_operator import RemoteOperator
+from tello_bt.nodes.conditionals.is_battery_low import IsBatteryLow
+from tello_bt.nodes import PluginClient
 
-from tello_bt.actions.can_run_plugin import CanRunPlugin
+from tello_bt.nodes.conditionals.can_run_plugin import CanRunPlugin
 
 
-class Root(py_trees.composites.Sequence):
+class DefaultBT(py_trees.composites.Sequence):
     def __init__(
         self,
-        name: str,
-        memory: bool,
         node: Node,
-        children: typing.Optional[typing.List[py_trees.behaviour.Behaviour]] = None,
     ):
-        super().__init__(name, memory, children)
+        super().__init__("DefaultBT", memory=True)
         self.node = node
 
         self.build_tree()

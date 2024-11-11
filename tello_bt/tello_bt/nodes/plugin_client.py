@@ -35,7 +35,10 @@ class PluginClient(py_trees.behaviour.Behaviour):
             return None
 
         request = PluginServer.Request()
-        request.tick = True
+
+        # TODO: Send the blackboard information if set
+        request.blackboard = "{}"
+
         future = self.client.call_async(request)
         rclpy.spin_until_future_complete(self.node, future)
 
@@ -51,4 +54,4 @@ class PluginClient(py_trees.behaviour.Behaviour):
         if response is None:
             return py_trees.common.Status.FAILURE
 
-        return py_trees.common.Status(STATUS_MAP[response.node_state])
+        return py_trees.common.Status(STATUS_MAP[response.status])

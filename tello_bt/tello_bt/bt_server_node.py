@@ -3,7 +3,7 @@ import py_trees
 from py_trees.trees import BehaviourTree
 from rclpy.logging import rclpy
 from rclpy.node import Node
-from tello_bt.tree import Root
+from tello_bt.bt.default_bt import DefaultBT
 
 
 class BtServerNode(Node):
@@ -12,7 +12,7 @@ class BtServerNode(Node):
     def __init__(self, node_name):
         super().__init__(node_name)
 
-        self.bt = BehaviourTree(root=Root("Root", True, self))
+        self.bt = BehaviourTree(root=DefaultBT(node=self))
         self.bt.setup()
 
     def read_params(self):
