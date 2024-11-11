@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any, Optional
 import os
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Suppress TensorFlow logging
@@ -134,7 +135,7 @@ class LandmarkDetectorNode(PluginBase):
 
         self.prev_image_msg = self.received_image_msg
 
-    def tick(self) -> NodeState:
+    def tick(self, blackboard: Optional[dict["str", Any]] = None) -> NodeState:
         try:
             self._process_image()
         except Exception as e:
