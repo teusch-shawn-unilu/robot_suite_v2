@@ -1,6 +1,13 @@
+# Status
+uint8 FAILURE = 0
+uint8 RUNNING = 1
+uint8 SUCCESS = 2
+uint8 INVALID = 3
+
 # Request
-bool tick # Tick the Node should always be true (Not used)
+string blackboard # Json string 
+
 ---
 # Result
-uint8 node_state # 0 - FAILURE | 1 - RUNNING | 2 - SUCCESS 
-
+uint8 status
+string blackboard # Json string
