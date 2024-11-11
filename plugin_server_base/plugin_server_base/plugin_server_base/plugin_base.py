@@ -1,15 +1,17 @@
-from sys import exec_prefix
+from abc import abstractmethod
+from typing import Any, Optional, overload
 from rclpy.node import Node
-from rclpy.service import SrvTypeResponse, SrvTypeRequest
 from plugin_services.srv import PluginServer
 import rclpy
 from enum import Enum
+import json
 
 
 class NodeState(Enum):
     FAILURE = 0
     RUNNING = 1
     SUCCESS = 2
+    INVALID = 3
 
 
 class PluginBase(Node):
@@ -54,11 +56,38 @@ class PluginBase(Node):
             self.get_logger().error(f"Tick Method has failed to run with {e}")
 
     def _service_callback(
-        self, request: PluginServer, response: PluginServer
-    ) -> PluginServer:
-        """Sets the current state of the node based on the action request
-        This will allow the node to be controlled by the BT_server
-        This method should not be modified
+        self, request: PluginServer.Request, response: PluginServer.Response
+    ) -> PluginServer.Response:
+        """
+        Handles incoming action requests to control the node's state.
+
+        This method is triggered by the action requests from the BT_server to
+        control the state of the node. It sends the node's current state to the
+        server, allowing the server to initiate any fallback procedures if needed.
+        Then, it processes the request, updates the node's status, and sends the
+        updated status and blackboard data back in the response. This method
+        should not be modified.
+
+        Parameters:
+            request (PluginServer.Request): The incoming request containing
+                action details and the serialized blackboard data for the node.
+            response (PluginServer.Response): The response object that will be
+                populated with the current node status and updated blackboard
+                data before returning to the client.
+
+        Returns:
+            PluginServer.Response: The populated response object containing:
+                - `status`: The current state of the node after executing `tick`.
+                - `blackboard`: The serialized blackboard data updated based
+                  on the action request.
+
+        Behavior:
+            - Logs the received action request and the resulting node status.
+            - Deserializes the blackboard data from the request.
+            - Executes the `tick` method using the provided blackboard data to
+              determine the new node state.
+            - Updates the response with the node's new status and serialized
+              blackboard data for returning to the BT_server.
         """
 
         # Send the current state before setting new state
@@ -66,34 +95,76 @@ class PluginBase(Node):
         # procedure
 
         self.get_logger().debug(
-            f"Plugin <{self.plugin_name}> has been requested to be ticked with {request}"
+            "Plugin <{self.plugin_name}> has been requested to be ticked"
         )
+        blackboard = self._deserialize_blackboard(request.blackboard)
 
-        node_state = self.tick()
+        status = self.tick(blackboard)
 
-        self.get_logger().debug(f"Plugin <{self.plugin_name}> state is: {node_state}")
+        self.get_logger().debug(f"Plugin <{self.plugin_name}> status: {status}")
 
-        response.node_state = node_state.value
+        response.status = status.value
+        response.blackboard = self._serialize_blackboard(blackboard)
 
         return response
 
-    def tick(self) -> NodeState:
-        """This method should be implemented!
-        You should place here what you want your node to do.
-        It gets called `tick_rate` times a second if state=RUNNING
+    def _deserialize_blackboard(
+        self, request_blackboard: str
+    ) -> dict["str", Any] | None:
+        self.get_logger().debug(
+            f"Deserializing received blackboard: {request_blackboard}"
+        )
+        blackboard = None
+        try:
+            blackboard = json.loads(request_blackboard)
+        except json.decoder.JSONDecodeError as e:
+            self.get_logger().warning(f"Failed to deserialize received blackboard: {e}")
+        return blackboard
+
+    def _serialize_blackboard(self, blackboard: dict["str", Any] | None) -> str:
+        self.get_logger().debug(f"Serializing blackboard: {blackboard}")
+        serialized_blackboard = "{}"
+        try:
+            serialized_blackboard = json.dumps(blackboard)
+        except TypeError as e:
+            self.get_logger().warning(f"Failed to serialize blackboard: {e}")
+        return serialized_blackboard
+
+    @abstractmethod
+    def tick(self, blackboard: Optional[dict["str", Any]] = None) -> NodeState:
         """
-        assert False, "Please make sure to implement the tick method of you Node"
+        Execute the main behavior of the node.
+
+        This method defines the core functionality of the node and must be
+        implemented in subclasses to specify the behavior of the node. The `tick`
+        method is called at the rate defined by `tick_rate` when standalone mode
+        is active.
+
+        Parameters:
+            blackboard (Optional[dict[str, Any]]): A dictionary representing the
+                blackboard, containing shared data that the node can access and
+                potentially modify. If no blackboard data is provided, this parameter
+                will be `None`.
+
+        Returns:
+            NodeState: The resulting state of the node after the tick execution.
+                Common values are `SUCCESS`, `FAILURE`, or `RUNNING`.
+
+        Note:
+            This is an abstract method and must be implemented in any subclass.
+        """
+        pass
 
 
 def main():
     rclpy.init()
     node = PluginBase("test_plugin_node")
 
-    def tick_dummy():
+    def tick_dummy(blackboard):
         print("Ticking...")
         return NodeState.SUCCESS
 
-    node.tick = tick_dummy
+    node.tick = tick_dummy  # type: ignore
     rclpy.spin(node)
     rclpy.shutdown()
 
