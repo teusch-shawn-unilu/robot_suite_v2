@@ -28,6 +28,7 @@ theme:
         name: Switch to dark mode
 markdown_extensions:
   - admonition
+  - abbr
   - attr_list
   - md_in_html
   - pymdownx.inlinehilite
