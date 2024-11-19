@@ -1,6 +1,10 @@
 site_name: Tello Suite
 site_url: https://snt-arg.github.io/tello_suite/
+repo_url: https://github.com/snt-arg/tello_suite
+repo_name: snt-arg/tello_suite
 theme:
+  icon:
+    repo: fontawesome/brands/github
   name: material
   palette: 
     # Dark Mode
