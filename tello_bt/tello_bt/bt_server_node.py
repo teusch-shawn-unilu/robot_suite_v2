@@ -8,14 +8,16 @@ from tello_bt.bootstrap import bootstrap_bt, BootstrapError
 
 
 class BtServerNode(Node):
-    bt_tick_freq: int = 60  # Hz
+    _bt_tick_freq: int = 60  # Hz
+    _bt_name: str = "default_bt"
 
     def __init__(self, node_name):
         super().__init__(node_name)
 
+        self.read_params()
+
         try:
-            # TODO: Read params
-            bootstrap_fn = bootstrap_bt("default_bt")
+            bootstrap_fn = bootstrap_bt(self._bt_name)
         except (ImportError, BootstrapError) as e:
             raise Exception("Failed to bootstrap BT")
 
@@ -26,7 +28,13 @@ class BtServerNode(Node):
         self.bt.setup()
 
     def read_params(self):
-        pass
+        self.declare_parameter("bt_name", self._bt_name)
+        self.declare_parameter("tick_freq", self._bt_tick_freq)
+
+        self._bt_name = self.get_parameter("bt_name").get_parameter_value().string_value
+        self._bt_tick_freq = (
+            self.get_parameter("tick_freq").get_parameter_value().integer_value
+        )
 
     def print_tree(self, tree: BehaviourTree):
         print(py_trees.display.unicode_tree(root=tree.root, show_status=True))
@@ -35,7 +43,7 @@ class BtServerNode(Node):
         while rclpy.ok():
             self.bt.tick(post_tick_handler=self.print_tree)
             rclpy.spin_once(self, timeout_sec=1)
-            time.sleep(1 / self.bt_tick_freq)
+            time.sleep(1 / self._bt_tick_freq)
 
         self.bt.shutdown()
 
