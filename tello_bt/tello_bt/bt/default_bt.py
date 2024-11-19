@@ -89,3 +89,7 @@ class DefaultBT(py_trees.composites.Sequence):
         )
 
         self.add_children([drone_connection, battery_checker, remote_operator, plugins])
+
+
+def bootstrap(ros_node: Node) -> py_trees.behaviour.Behaviour:
+    return DefaultBT(ros_node)
