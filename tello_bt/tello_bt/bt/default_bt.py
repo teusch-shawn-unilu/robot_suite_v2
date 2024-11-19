@@ -77,7 +77,7 @@ class DefaultBT(py_trees.composites.Sequence):
             children=[
                 py_trees.composites.Sequence(
                     "HandGesturesControl",
-                    memory=True,
+                    memory=False,
                     children=[
                         CanRunPlugin("CanRunHandGestures", "landmark_detector_node"),
                         PluginClient(
