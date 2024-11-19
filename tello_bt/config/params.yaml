@@ -1,3 +1,4 @@
 bt_server:
   ros__parameters:
+    bt_name: simple_bt
 
