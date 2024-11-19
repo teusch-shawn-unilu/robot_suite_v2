@@ -3,7 +3,8 @@ import py_trees
 from py_trees.trees import BehaviourTree
 from rclpy.logging import rclpy
 from rclpy.node import Node
-from tello_bt.bt.default_bt import DefaultBT
+from tello_bt.bt.default_bt import DefaultBT, bootstrap
+from tello_bt.bootstrap import bootstrap_bt, BootstrapError
 
 
 class BtServerNode(Node):
@@ -12,7 +13,16 @@ class BtServerNode(Node):
     def __init__(self, node_name):
         super().__init__(node_name)
 
-        self.bt = BehaviourTree(root=DefaultBT(node=self))
+        try:
+            # TODO: Read params
+            bootstrap_fn = bootstrap_bt("default_bt")
+        except (ImportError, BootstrapError) as e:
+            raise Exception("Failed to bootstrap BT")
+
+        if bootstrap_fn is None:
+            raise Exception("Ensure that your bootstrap function returns a tree")
+
+        self.bt = BehaviourTree(root=bootstrap_fn(self))
         self.bt.setup()
 
     def read_params(self):
