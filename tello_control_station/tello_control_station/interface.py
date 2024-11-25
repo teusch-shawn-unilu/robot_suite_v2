@@ -38,9 +38,9 @@ class Interface:
 
         display_info = pygame.display.Info()
         # self.width = display_info.current_w // 2
-        self.scale_factor = 0.95
+        self.scale_factor = 0.90
         self.width = int(display_info.current_w * self.scale_factor)
-        self.height = int(display_info.current_h * self.scale_factor)
+        self.height = int(display_info.current_h * self.scale_factor) - 100
 
         self.display = pygame.display.set_mode((self.width, self.height))
         self.display.fill((35, 37, 40))
