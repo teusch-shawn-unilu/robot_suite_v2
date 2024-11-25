@@ -97,13 +97,10 @@ class PluginBase(Node):
 
         blackboard = self._deserialize_blackboard(request.blackboard)
 
-        self.get_logger().error(
-            f"Parameter signature: {inspect.signature(self.tick).parameters}"
-        )
         if len(inspect.signature(self.tick).parameters) == 0:
-            # self.get_logger().warning(
-            #     'tick() will be deprecated. Please change your tick method signature to <def tick(self, blackboard: Optional[dict["str", Any]] = None)>',
-            # )
+            self.get_logger().warning(
+                'tick() will be deprecated. Please change your tick method signature to <def tick(self, blackboard: Optional[dict["str", Any]] = None)>',
+            )
             status = self.tick()
         else:
             status = self.tick(blackboard)
