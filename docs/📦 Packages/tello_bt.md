@@ -41,20 +41,20 @@ Decorators modify the behavior of their child node based on specific rules or co
 Composite nodes are used to group multiple child nodes and control their execution flow.
 
 - **`py_trees.composites.Sequence`**: Executes its children in order until one fails. Returns:
-
-  - `SUCCESS` if all children succeed.
-  - `FAILURE` if any child fails.
-  - `RUNNING` if a child is still running.
+    
+    - `SUCCESS` if all children succeed.
+    - `FAILURE` if any child fails.
+    - `RUNNING` if a child is still running.
 
 - **`py_trees.composites.Selector`**: Executes its children in order until one succeeds. Returns:
 
-  - `SUCCESS` if any child succeeds.
-  - `FAILURE` if all children fail.
-  - `RUNNING` if a child is still running.
+    - `SUCCESS` if any child succeeds.
+    - `FAILURE` if all children fail.
+    - `RUNNING` if a child is still running.
 
 - **`py_trees.composites.Parallel`**: Executes all children simultaneously. Returns:
-  - `SUCCESS` if the required number of children succeed.
-  - `FAILURE` if too many children fail or if required conditions are not met.
+    - `SUCCESS` if the required number of children succeed.
+    - `FAILURE` if too many children fail or if required conditions are not met.
 
 ---
 
@@ -64,9 +64,9 @@ By default, the behavior tree used is `tello_bt.bt.DefaultBT`. To create your ow
 
 1. **Create a New File**: Add a new Python file in the `tello_bt.bt` directory and name it appropriately.
 2. **Define the `bootstrap` Function**:
-   - Your file must define a function named `bootstrap(ros_node: rclpy.Node) -> py_trees.behaviour.Behaviour`.
-   - This function will be called by the BT ROS node to load your behavior tree.
-   - It should return the root of your tree.
+    - Your file must define a function named `bootstrap(ros_node: rclpy.Node) -> py_trees.behaviour.Behaviour`.
+       - This function will be called by the BT ROS node to load your behavior tree.
+       - It should return the root of your tree.
 3. **Update Parameters**: Modify the parameter file to set the `bt_name` field to your file name (without the `.py` extension).
 
 ### Example
@@ -80,8 +80,8 @@ import py_trees
 from rclpy.node import Node
 
 def create_tree(): # Leaf nodes
-success_node = py_trees.behaviours.Success(name="Always Succeed")
-failure_node = py_trees.behaviours.Failure(name="Always Fail")
+    success_node = py_trees.behaviours.Success(name="Always Succeed")
+    failure_node = py_trees.behaviours.Failure(name="Always Fail")
 
     # Decorator
     invert_failure = py_trees.decorators.Inverter(child=failure_node)
@@ -93,8 +93,8 @@ failure_node = py_trees.behaviours.Failure(name="Always Fail")
     return sequence
 
 def bootstrap(ros_node: Node) -> py_trees.behavior.Behaviour:
-tree = create_tree()
-return tree
+    tree = create_tree()
+    return tree
 ```
 
 #### Parameters File
@@ -130,34 +130,33 @@ The structure and purpose of each part of the tree are as follows:
 - **Type**: Selector (no memory)
 - **Child**: `IsDroneConnected`
 - **Purpose**: Verifies if the drone is connected.
-  - If the connection is successful (`SUCCESS`), it moves to the next step.
-  - If the connection is not established (`FAILURE`), the tree stops ticking and the sequence fails.
+    - If the connection is successful (`SUCCESS`), it moves to the next step.
+    - If the connection is not established (`FAILURE`), the tree stops ticking and the sequence fails.
 
 ### 2. **Battery Checker**
 
 - **Type**: Selector (no memory)
 - **Children**:
-  - **`IsBatteryLow`**: Checks if the battery is low. If it is, returns `SUCCESS`.
-  - **Inverter** (decorator) → **`LandAction`**: If the battery is not low, the decorator inverts the result of the `LandAction`.
-    - The `LandAction` would normally return `FAILURE` (since landing is not required when the battery is okay), but the `Inverter` converts it to `SUCCESS`.
+    - **`IsBatteryLow`**: Checks if the battery is low. If it is, returns `SUCCESS`.
+    - **Inverter** (decorator) → **`LandAction`**: If the battery is not low, the decorator inverts the result of the `LandAction`.
+        - The `LandAction` would normally return `FAILURE` (since landing is not required when the battery is okay), but the `Inverter` converts it to `SUCCESS`.
 - **Purpose**: Ensures that if the battery is low, the drone lands safely. Otherwise, it allows the behavior tree to continue execution.
 
 ### 3. **Remote Operator**
 
 - **Type**: Action Node
 - **Name**: `RemoteOperator`
-- **Purpose**: Communicates with a remote operator interface to check for manual override commands. Returns:
-  - `SUCCESS` if the operator is actively controlling the drone.
-  - `FAILURE` if no manual control is active.
+- **Purpose**: Checks keyboard input from `tello_control_station` and change selected plugin from blackboard to hand gestures plugin if selected.
+    - Alawas returns `SUCCESS`
 
 ### 4. **Plugins Selector**
 
 - **Type**: Selector (no memory)
 - **Children**:
-
-  1. **Hand Gestures Control** (Sequence with memory):
-     - **`CanRunPlugin`**: Checks if the "landmark_detector_node" plugin is enabled and can run.
-     - **`PluginClient`**: Executes the plugin responsible for hand gesture control, enabling drone interaction using visual gestures.
+  
+    1. **Hand Gestures Control** (no memory):
+        - **`CanRunPlugin`**: Checks if the "landmark_detector_node" plugin is enabled and can run.
+         - **`PluginClient`**: Executes the plugin responsible for hand gesture control, enabling drone interaction using visual gestures.
 
 - **Purpose**: Extends the drone's capabilities by enabling additional plugins, such as gesture control. If no plugin is active or available, this branch fails, but the rest of the tree can continue.
 
