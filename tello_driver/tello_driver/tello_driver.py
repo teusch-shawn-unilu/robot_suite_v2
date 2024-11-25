@@ -111,7 +111,7 @@ class TelloRosWrapper(Node):
         self._cv_bridge = CvBridge()
 
         self.tello = Tello()
-        self.tello.set_loglevel(self.tello.LOG_INFO)
+        self.tello.set_loglevel(self.tello.LOG_WARN)
         self.begin()
 
     def begin(self) -> None:
@@ -135,9 +135,7 @@ class TelloRosWrapper(Node):
         if self._video_mode == "16:9":
             zoom = True
         elif self._video_mode != "4:3":
-            self.get_logger().warn(
-                "Invalid video mode! Only 4:3 and 16:9 are valid"
-            )
+            self.get_logger().warn("Invalid video mode! Only 4:3 and 16:9 are valid")
 
         self.tello.set_video_mode(zoom)
         self.tello.set_exposure(self._camera_exposure)
@@ -156,9 +154,7 @@ class TelloRosWrapper(Node):
         self._odometry_publisher = self.create_publisher(
             Odometry, self._odom_topic_name, 1
         )
-        self._imu_publisher = self.create_publisher(
-            Imu, self._imu_topic_name, 1
-        )
+        self._imu_publisher = self.create_publisher(Imu, self._imu_topic_name, 1)
         self._battery_state_publisher = self.create_publisher(
             BatteryState, self._battery_state_topic_name, 1
         )
@@ -167,13 +163,9 @@ class TelloRosWrapper(Node):
     def _init_subscribers(self) -> None:
         """Initialize all the required subscribers."""
         self.get_logger().info("Initializing the subscribers.")
-        self.tello.subscribe(
-            self.tello.EVENT_FLIGHT_DATA, self._flight_data_callback
-        )
+        self.tello.subscribe(self.tello.EVENT_FLIGHT_DATA, self._flight_data_callback)
 
-        self.tello.subscribe(
-            self.tello.EVENT_LOG_DATA, self._log_data_callback
-        )
+        self.tello.subscribe(self.tello.EVENT_LOG_DATA, self._log_data_callback)
 
         self._velocity_command_subscriber = self.create_subscription(
             Twist,
@@ -240,9 +232,7 @@ class TelloRosWrapper(Node):
     def _start_camera_image_thread(self) -> None:
         """Start the thread that receives the camera image from the drone."""
         self._stop_request = threading.Event()
-        self._video_thread = threading.Thread(
-            target=self._camera_image_callback
-        )
+        self._video_thread = threading.Thread(target=self._camera_image_callback)
         self._video_thread.start()
 
     # -------------
@@ -293,9 +283,7 @@ class TelloRosWrapper(Node):
         if msg.data in [0, 1, 2]:
             self.tello.set_exposure(msg.data)
         else:
-            self.get_logger().warn(
-                "Invalid exposure value! Only 0, 1, 2 are valid"
-            )
+            self.get_logger().warn("Invalid exposure value! Only 0, 1, 2 are valid")
 
     def _land_callback(self, msg: Empty) -> None:
         """Callback for the land subscriber.
@@ -314,8 +302,6 @@ class TelloRosWrapper(Node):
         msg  # type: ignore
         self.tello.takeoff()
         self.tello.set_alt_limit(self._alt_limit)
-        print("Altitude limit:", self.tello.get_alt_limit())
-        print("Atitude limit:", self.tello.get_att_limit())
 
     def _palm_land_callback(self, msg: Empty) -> None:
         """Callback for the palm land subscriber.
@@ -364,9 +350,7 @@ class TelloRosWrapper(Node):
         elif msg.flip_back_right:
             self.tello.flip_backright()
 
-    def _log_data_callback(
-        self, event: Event, sender: Tello, data: LogData
-    ) -> None:
+    def _log_data_callback(self, event: Event, sender: Tello, data: LogData) -> None:
         """Callback for the log data subscriber from tellopy."""
         # calling event and sender to ignore linter error
         event  # type: ignore
@@ -398,9 +382,7 @@ class TelloRosWrapper(Node):
         sender  # type: ignore
 
         flight_data_msg = generate_flight_data_msg(data)
-        battey_state_msg = generate_battery_state_msg(
-            self.get_clock().now(), data
-        )
+        battey_state_msg = generate_battery_state_msg(self.get_clock().now(), data)
 
         self._current_battery_percentage = flight_data_msg.battery_percentage
 
@@ -421,13 +403,23 @@ class TelloRosWrapper(Node):
     def _camera_image_callback(self) -> None:
         """Callback for the camera image subscriber."""
         video_stream = self.tello.get_video_stream()
-        container = av.open(video_stream)
 
-        self.get_logger().info("video stream is starting")
+        container = None
 
-        for frame in container.decode(video=0):  # type: ignore
+        try:
+            container = av.open(video_stream, mode="r")
+        except av.AVError as e:
+            self.get_logger().error(f"Failed to open VideoStream: {e}")
+            return
+
+        frame_skip = 100
+        for frame in container.decode(video=0):
+            frame_skip -= 1
+            if frame_skip > 0:
+                continue
+
             # convert PyAV frame => PIL image => OpenCV image
-            image = np.array(frame.to_image())  # type: ignore
+            image = np.array(frame.to_image())
 
             # Reduced image size to have less delay
             image = cv2.resize(
@@ -452,9 +444,7 @@ class TelloRosWrapper(Node):
         """Connect to the Tello drone network automatically."""
         self.get_logger().info("Connecting to drone")
         if self._auto_connect_to_wifi:
-            if not ctwd.connect_device(
-                self._tello_ssid, self._tello_pw, verbose=False
-            ):
+            if not ctwd.connect_device(self._tello_ssid, self._tello_pw, verbose=False):
                 self.get_logger().error("Connection to drone unsuccessful!")
 
         self.tello.connect()
@@ -473,20 +463,14 @@ class TelloRosWrapper(Node):
         self.get_logger().info("Reading parameters...")
 
         self.declare_parameter("image_topic_name", self._image_topic_name)
-        self.declare_parameter(
-            "flight_data_topic_name", self._flight_data_topic_name
-        )
+        self.declare_parameter("flight_data_topic_name", self._flight_data_topic_name)
         self.declare_parameter(
             "velocity_command_topic_name", self._velocity_command_topic_name
         )
         self.declare_parameter("land_topic_name", self._land_topic_name)
         self.declare_parameter("takeoff_topic_name", self._takeoff_topic_name)
-        self.declare_parameter(
-            "flip_control_topic_name", self._flip_control_topic_name
-        )
-        self.declare_parameter(
-            "auto_wifi_connection", self._auto_connect_to_wifi
-        )
+        self.declare_parameter("flip_control_topic_name", self._flip_control_topic_name)
+        self.declare_parameter("auto_wifi_connection", self._auto_connect_to_wifi)
         self.declare_parameter("tello_ssid", self._tello_ssid)
         self.declare_parameter("tello_pw", self._tello_pw)
         self.declare_parameter("odom_topic_name", self._odom_topic_name)
@@ -503,9 +487,7 @@ class TelloRosWrapper(Node):
         )
 
         self._image_topic_name = (
-            self.get_parameter("image_topic_name")
-            .get_parameter_value()
-            .string_value
+            self.get_parameter("image_topic_name").get_parameter_value().string_value
         )
         self._flight_data_topic_name = (
             self.get_parameter("flight_data_topic_name")
@@ -518,14 +500,10 @@ class TelloRosWrapper(Node):
             .string_value
         )
         self._land_topic_name = (
-            self.get_parameter("land_topic_name")
-            .get_parameter_value()
-            .string_value
+            self.get_parameter("land_topic_name").get_parameter_value().string_value
         )
         self._takeoff_topic_name = (
-            self.get_parameter("takeoff_topic_name")
-            .get_parameter_value()
-            .string_value
+            self.get_parameter("takeoff_topic_name").get_parameter_value().string_value
         )
         self._flip_control_topic_name = (
             self.get_parameter("flip_control_topic_name")
@@ -533,9 +511,7 @@ class TelloRosWrapper(Node):
             .string_value
         )
         self._auto_connect_to_wifi = (
-            self.get_parameter("auto_wifi_connection")
-            .get_parameter_value()
-            .bool_value
+            self.get_parameter("auto_wifi_connection").get_parameter_value().bool_value
         )
 
         self._tello_ssid = (
@@ -545,24 +521,16 @@ class TelloRosWrapper(Node):
             self.get_parameter("tello_pw").get_parameter_value().string_value
         )
         self._odom_frame_id = (
-            self.get_parameter("odom_frame_id")
-            .get_parameter_value()
-            .string_value
+            self.get_parameter("odom_frame_id").get_parameter_value().string_value
         )
         self._imu_frame_id = (
-            self.get_parameter("imu_frame_id")
-            .get_parameter_value()
-            .string_value
+            self.get_parameter("imu_frame_id").get_parameter_value().string_value
         )
         self._drone_frame_id = (
-            self.get_parameter("drone_frame_id")
-            .get_parameter_value()
-            .string_value
+            self.get_parameter("drone_frame_id").get_parameter_value().string_value
         )
         self._imu_topic_name = (
-            self.get_parameter("imu_topic_name")
-            .get_parameter_value()
-            .string_value
+            self.get_parameter("imu_topic_name").get_parameter_value().string_value
         )
 
         self._fast_mode = (
@@ -572,13 +540,13 @@ class TelloRosWrapper(Node):
             self.get_parameter("video_mode").get_parameter_value().string_value
         )
         self._camera_exposure = (
-            self.get_parameter("camera_exposure")
-            .get_parameter_value()
-            .integer_value
+            self.get_parameter("camera_exposure").get_parameter_value().integer_value
         )
         self._alt_limit = (
             self.get_parameter("alt_limit").get_parameter_value().integer_value
         )
+
+        self.get_logger().info(f"Altitude in parameters: {self._alt_limit}")
 
         img_size = (
             self.get_parameter("image_size")
