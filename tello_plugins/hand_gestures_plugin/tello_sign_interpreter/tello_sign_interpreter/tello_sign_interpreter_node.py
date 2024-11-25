@@ -21,7 +21,7 @@ class TelloSignInterpreterNode(Node):
         self.timer = self.create_timer(1 / 20, self.timer_callback)
 
         self.linear_speed = 0.3
-        self.angular_speed = 0.5
+        self.angular_speed = 0.4
 
         self.cmd_vel = Twist()
 
@@ -36,9 +36,7 @@ class TelloSignInterpreterNode(Node):
             self.takeoff()
 
         if num_hands == 2:
-            self.process_gestures(
-                msg.right_hand.gesture, msg.left_hand.gesture
-            )
+            self.process_gestures(msg.right_hand.gesture, msg.left_hand.gesture)
         else:
             self.stop()
 
@@ -80,49 +78,49 @@ class TelloSignInterpreterNode(Node):
         self.cmd_vel_pub.publish(self.cmd_vel)
 
     def move_forward(self):
-        self.get_logger().info("Moving forward")
+        self.get_logger().debug("Moving forward")
         self.cmd_vel.linear.x = self.linear_speed
 
     def move_backward(self):
-        self.get_logger().info("Moving backward")
+        self.get_logger().debug("Moving backward")
         self.cmd_vel.linear.x = -self.linear_speed
 
     def move_left(self):
-        self.get_logger().info("Moving left")
+        self.get_logger().debug("Moving left")
         self.cmd_vel.linear.y = self.linear_speed
 
     def move_right(self):
-        self.get_logger().info("Moving right")
+        self.get_logger().debug("Moving right")
         self.cmd_vel.linear.y = -self.linear_speed
 
     def move_up(self):
-        self.get_logger().info("Moving up")
+        self.get_logger().debug("Moving up")
         self.cmd_vel.linear.z = self.linear_speed + 0.2
 
     def move_down(self):
-        self.get_logger().info("Moving down")
+        self.get_logger().debug("Moving down")
         self.cmd_vel.linear.z = -(self.linear_speed + 0.2)
 
     def rotate_left(self):
-        self.get_logger().info("Rotating left")
+        self.get_logger().debug("Rotating left")
         self.cmd_vel.angular.z = self.angular_speed
 
     def rotate_right(self):
-        self.get_logger().info("Rotating right")
+        self.get_logger().debug("Rotating right")
         self.cmd_vel.angular.z = -self.angular_speed
 
     def takeoff(self):
-        self.get_logger().info("Standing up")
+        self.get_logger().debug("Standing up")
         self.takeoff_pub.publish(Empty())
 
     def land(self):
-        self.get_logger().info("Sitting down")
+        self.get_logger().debug("Sitting down")
         self.land_pub.publish(Empty())
 
     def flip(self):
         msg = FlipControl()
 
-        choice = random.choice(["left", "right", "forward", "back"])
+        choice = random.choice(["left", "right", "back"])
 
         if choice == "left":
             msg.flip_left = True
@@ -136,7 +134,7 @@ class TelloSignInterpreterNode(Node):
         self.flip_pub.publish(msg)
 
     def stop(self):
-        self.get_logger().info("Stopping")
+        self.get_logger().debug("Stopping")
         self.cmd_vel.linear.x = 0.0
         self.cmd_vel.linear.y = 0.0
         self.cmd_vel.linear.z = 0.0
