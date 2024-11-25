@@ -12,6 +12,7 @@ setup(
             ["resource/" + package_name],
         ),
         ("share/" + package_name, ["package.xml"]),
+        ("share/" + package_name, ["assets/commands.png"]),
     ],
     install_requires=["setuptools"],
     zip_safe=True,

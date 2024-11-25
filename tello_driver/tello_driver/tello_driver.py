@@ -412,7 +412,7 @@ class TelloRosWrapper(Node):
             self.get_logger().error(f"Failed to open VideoStream: {e}")
             return
 
-        frame_skip = 100
+        frame_skip = 50
         for frame in container.decode(video=0):
             frame_skip -= 1
             if frame_skip > 0:
