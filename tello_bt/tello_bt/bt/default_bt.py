@@ -62,7 +62,9 @@ class DefaultBT(py_trees.composites.Sequence):
             "BatteryChecker",
             memory=False,
             children=[
-                IsBatteryLow("IsBatteryLow", self.node),
+                py_trees.decorators.Inverter(
+                    "IsBAtteryLowInverter", IsBatteryLow("IsBatteryLow", self.node)
+                ),
                 py_trees.decorators.Inverter(
                     "LandActionInverter", LandAction("LandAction", self.node)
                 ),
