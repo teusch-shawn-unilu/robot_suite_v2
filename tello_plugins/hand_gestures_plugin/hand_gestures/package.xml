@@ -7,7 +7,7 @@
   <maintainer email="pmbs.123@gmail.com">pedros235</maintainer>
   <license>GPL-3.0</license>
 
-  <depend>cv-bridge</depend>
+  <depend>cv_bridge</depend>
 
   <export>
     <build_type>ament_python</build_type>
