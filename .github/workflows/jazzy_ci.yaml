@@ -27,6 +27,14 @@ jobs:
       - name: Build ROS 2 package
         uses: ros-tooling/action-ros-ci@v0.3
         with:
-          package-name: tello_suite
+          package-name: >
+            tello_suite
+            tello_driver
+            tello_msgs
+            tello_bringup
+            tello_bt
+            tello_control_station
+            hand_gestures
+            plugin_server_base
           target-ros2-distro: jazzy
 
