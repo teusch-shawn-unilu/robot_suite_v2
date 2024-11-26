@@ -1,6 +1,6 @@
 # 🚁 Tello Suite
 
-!!! important
+!!! danger
 
     This project is still a work in progress, so expect some bugs! If you encounter any, please open an issue or submit a PR with a fix.
 
