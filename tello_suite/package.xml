@@ -14,10 +14,10 @@
   <exec_depend>tello_msgs</exec_depend>
   <exec_depend>tello_nav</exec_depend>
   <exec_depend>tello_bringup</exec_depend>
-  <!-- <exec_depend>tello_app</exec_depend> -->
-  <!-- <exec_depend>tello_descriptions</exec_depend> -->
-  <!-- <exec_depend>tello_plugins</exec_depend> -->
-
+  <exec_depend>plugin_server_base</exec_depend>
+  <exec_depend>tello_bringup</exec_depend>
+  <exec_depend>tello_control_station</exec_depend>
+  <exec_depend>hand_gestures</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
