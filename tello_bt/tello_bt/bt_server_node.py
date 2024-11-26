@@ -3,7 +3,6 @@ import py_trees
 from py_trees.trees import BehaviourTree
 from rclpy.logging import rclpy
 from rclpy.node import Node
-from tello_bt.bt.default_bt import DefaultBT, bootstrap
 from tello_bt.bootstrap import bootstrap_bt, BootstrapError
 
 
@@ -18,7 +17,7 @@ class BtServerNode(Node):
 
         try:
             bootstrap_fn = bootstrap_bt(self._bt_name)
-        except (ImportError, BootstrapError) as e:
+        except (ImportError, BootstrapError):
             raise Exception("Failed to bootstrap BT")
 
         if bootstrap_fn is None:
@@ -42,6 +41,8 @@ class BtServerNode(Node):
     def run(self):
         while rclpy.ok():
             self.bt.tick(post_tick_handler=self.print_tree)
+            # if self.bt.root.status == py_trees.common.Status.FAILURE:
+            #     break
             rclpy.spin_once(self, timeout_sec=1)
             time.sleep(1 / self._bt_tick_freq)
 
