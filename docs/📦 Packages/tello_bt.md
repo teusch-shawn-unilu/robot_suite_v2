@@ -71,39 +71,39 @@ By default, the behavior tree used is `tello_bt.bt.DefaultBT`. To create your ow
 
 ### Example
 
-Below is a simple example of a behavior tree with a sequence node and a decorator.
+!!! example
 
-#### Python Code
+    **Python Code**
 
-```python title="tello_bt/bt/simple_bt.py"
-import py_trees
-from rclpy.node import Node
+    ```python title="tello_bt/bt/simple_bt.py"
+    import py_trees
+    from rclpy.node import Node
 
-def create_tree(): # Leaf nodes
-    success_node = py_trees.behaviours.Success(name="Always Succeed")
-    failure_node = py_trees.behaviours.Failure(name="Always Fail")
+    def create_tree(): # Leaf nodes
+        success_node = py_trees.behaviours.Success(name="Always Succeed")
+        failure_node = py_trees.behaviours.Failure(name="Always Fail")
 
-    # Decorator
-    invert_failure = py_trees.decorators.Inverter(child=failure_node)
+        # Decorator
+        invert_failure = py_trees.decorators.Inverter(child=failure_node)
 
-    # Composite
-    sequence = py_trees.composites.Sequence(name="Simple Sequence")
-    sequence.add_children([success_node, invert_failure])
+        # Composite
+        sequence = py_trees.composites.Sequence(name="Simple Sequence")
+        sequence.add_children([success_node, invert_failure])
 
-    return sequence
+        return sequence
 
-def bootstrap(ros_node: Node) -> py_trees.behavior.Behaviour:
-    tree = create_tree()
-    return tree
-```
+    def bootstrap(ros_node: Node) -> py_trees.behavior.Behaviour:
+        tree = create_tree()
+        return tree
+    ```
 
-#### Parameters File
+    **Parameters File**
 
-```yaml title="config/params.yaml"
-bt_server:
-    ros__parameters:
-        bt_name: simple_bt
-```
+    ```yaml title="config/params.yaml"
+    bt_server:
+        ros__parameters:
+            bt_name: simple_bt
+    ```
 
 ## Explaining Default BT
 
@@ -162,52 +162,54 @@ The structure and purpose of each part of the tree are as follows:
 
 ---
 
-```python title="tello_bt/bt/default_bt.py"
-# ...
-class DefaultBT(py_trees.composites.Sequence):
+!!! example
+
+    ```python title="tello_bt/bt/default_bt.py"
     # ...
-    def build_tree(self):
-        drone_connection = py_trees.composites.Selector(
-            "DroneConnection",
-            memory=False,
-            children=[
-                IsDroneConnected("IsDroneConnected"),
-            ],
-        )
+    class DefaultBT(py_trees.composites.Sequence):
+        # ...
+        def build_tree(self):
+            drone_connection = py_trees.composites.Selector(
+                "DroneConnection",
+                memory=False,
+                children=[
+                    IsDroneConnected("IsDroneConnected"),
+                ],
+            )
 
-        battery_checker = py_trees.composites.Selector(
-            "BatteryChecker",
-            memory=False,
-            children=[
-                IsBatteryLow("IsBatteryLow", self.node),
-                py_trees.decorators.Inverter(
-                    "LandActionInverter", LandAction("LandAction", self.node)
-                ),
-            ],
-        )
+            battery_checker = py_trees.composites.Selector(
+                "BatteryChecker",
+                memory=False,
+                children=[
+                    IsBatteryLow("IsBatteryLow", self.node),
+                    py_trees.decorators.Inverter(
+                        "LandActionInverter", LandAction("LandAction", self.node)
+                    ),
+                ],
+            )
 
-        remote_operator = RemoteOperator("RemoteOperator", self.node)
+            remote_operator = RemoteOperator("RemoteOperator", self.node)
 
-        plugins = py_trees.composites.Selector(
-            "Plugins",
-            memory=False,
-            children=[
-                py_trees.composites.Sequence(
-                    "HandGesturesControl",
-                    memory=False,
-                    children=[
-                        CanRunPlugin("CanRunHandGestures", "landmark_detector_node"),
-                        PluginClient(
-                            "HandGesturesPlugin", "landmark_detector_node", self.node
-                        ),
-                    ],
-                )
-            ],
-        )
+            plugins = py_trees.composites.Selector(
+                "Plugins",
+                memory=False,
+                children=[
+                    py_trees.composites.Sequence(
+                        "HandGesturesControl",
+                        memory=False,
+                        children=[
+                            CanRunPlugin("CanRunHandGestures", "landmark_detector_node"),
+                            PluginClient(
+                                "HandGesturesPlugin", "landmark_detector_node", self.node
+                            ),
+                        ],
+                    )
+                ],
+            )
 
-        self.add_children([drone_connection, battery_checker, remote_operator, plugins])
+            self.add_children([drone_connection, battery_checker, remote_operator, plugins])
 
 
-def bootstrap(ros_node: Node) -> py_trees.behaviour.Behaviour:
-    return DefaultBT(ros_node)
-```
+    def bootstrap(ros_node: Node) -> py_trees.behaviour.Behaviour:
+        return DefaultBT(ros_node)
+    ```

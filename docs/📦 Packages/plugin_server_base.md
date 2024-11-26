@@ -15,24 +15,22 @@ Using this package is straightforward and requires only two steps:
 
     The `tick()` method functions like a loop, either called by the behavior tree or, if in standalone mode, called at a default rate of 30 Hz.
 
-### Example
+!!! example
 
-Here is a very basic example on how to make use of this package
+    ```python
+    from plugin_server_base.plugin_base import PluginBase
+    from typing import Optional, Any
 
-```python
-from plugin_server_base.plugin_base import PluginBase
-from typing import Optional, Any
+    class MyNode(PluginBase):
+      def __init__(self, node_name: str):
+        super().__init__(node_name)
 
-class MyNode(PluginBase):
-  def __init__(self, node_name: str):
-    super().__init__(node_name)
+        # ...
 
-    # ...
-
-  def tick(self, blackboard: Optional[dict["str", Any]] = None):
-    # Implement here the logic
-    pass
-```
+      def tick(self, blackboard: Optional[dict["str", Any]] = None):
+        # Implement here the logic
+        pass
+    ```
 
 ## Parameters
 
