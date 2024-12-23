@@ -24,8 +24,16 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Set up Python environment
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+
       - name: Install py-trees dependency
-        run: pip install py-trees
+        run: |
+          source venv/bin/activate
+          pip install py-trees
 
       - name: Build ROS 2 package
         uses: ros-tooling/action-ros-ci@v0.3
