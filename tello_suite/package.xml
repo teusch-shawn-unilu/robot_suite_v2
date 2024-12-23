@@ -9,6 +9,7 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <depend>python3-py-trees</depend>
   <exec_depend>tello_driver</exec_depend>
   <exec_depend>tello_bt</exec_depend>
   <exec_depend>tello_msgs</exec_depend>
