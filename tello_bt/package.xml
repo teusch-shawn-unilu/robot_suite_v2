@@ -7,7 +7,8 @@
   <maintainer email="snt-arg@github.com">snt-arg</maintainer>
   <license>GPL-3.0</license>
 
-  <depend>python3-py-trees</depend>
+  <depend>python3-pytrees</depend>
+  <depend>python3-pygame</depend>
   <depend>rclpy</depend>
   <depend>plugin_base_server</depend>
   <depend>plugin_services</depend>
