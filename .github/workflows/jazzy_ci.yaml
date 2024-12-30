@@ -1,52 +1,51 @@
 name: Jazzy CI
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches: [ "main" ]
+    push:
+        branches:
+            - main
+    pull_request:
+        branches: ["main"]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    container:
-        image: rostooling/setup-ros-docker:ubuntu-noble-ros-jazzy-ros-base-latest
-    steps:
-      - name: Setup ROS2
-        uses: ros-tooling/setup-ros@v0.7
-        with:
-          use-ros2-testing: true
-          required-ros-distributions: jazzy
+    build:
+        runs-on: ubuntu-latest
+        container:
+            image: rostooling/setup-ros-docker:ubuntu-noble-ros-jazzy-ros-base-latest
+        steps:
+            - name: Setup ROS2
+              uses: ros-tooling/setup-ros@v0.7
+              with:
+                  use-ros2-testing: true
+                  required-ros-distributions: jazzy
 
-      - name: Checkout Repository with submodules
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
+            - name: Checkout Repository with submodules
+              uses: actions/checkout@v4
+              with:
+                  submodules: recursive
 
-      - name: Set up Python environment
-        run: |
-          apt install python3-venv -y
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
+            - name: Set up Python environment
+              run: |
+                  apt install python3-venv -y
+                  python3 -m venv venv
+                  . venv/bin/activate
+                  pip install --upgrade pip
 
-      - name: Install py-trees dependency
-        run: |
-          source venv/bin/activate
-          pip install py-trees
+            - name: Install py-trees dependency
+              run: |
+                  . venv/bin/activate
+                  pip install py-trees
 
-      - name: Build ROS 2 package
-        uses: ros-tooling/action-ros-ci@v0.3
-        with:
-          package-name: >
-            tello_suite
-            tello_driver
-            tello_msgs
-            tello_bringup
-            tello_bt
-            tello_control_station
-            hand_gestures
-            plugin_server_base
-          target-ros2-distro: jazzy
-
+            - name: Build ROS 2 package
+              uses: ros-tooling/action-ros-ci@v0.3
+              with:
+                  package-name: >
+                      tello_suite
+                      tello_driver
+                      tello_msgs
+                      tello_bringup
+                      tello_bt
+                      tello_control_station
+                      hand_gestures
+                      plugin_server_base
+                  target-ros2-distro: jazzy
