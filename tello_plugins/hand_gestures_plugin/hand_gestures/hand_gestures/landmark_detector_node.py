@@ -2,17 +2,12 @@ from __future__ import annotations
 from typing import Any, Optional
 import os
 
+from hand_gestures.models.mp_model import MediaPipeGesturesRecognizer
+
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Suppress TensorFlow logging
 import rclpy
 import cv_bridge
-import mediapipe as mp
 import hand_gestures.helpers as helpers
-
-from mediapipe.tasks.python.vision import (
-    GestureRecognizerOptions,
-    GestureRecognizer,
-)
-from mediapipe.tasks.python import BaseOptions
 
 from rclpy.publisher import Publisher
 from rclpy.subscription import Subscription
@@ -64,19 +59,15 @@ class LandmarkDetectorNode(PluginBase):
         self.pkg_share_dir = get_package_share_directory("hand_gestures")
         self.bridge = cv_bridge.CvBridge()
 
-        # Model to detect hand landmarks + gestures
-        self.gesture_recognizer = GestureRecognizer.create_from_options(
-            GestureRecognizerOptions(
-                base_options=BaseOptions(
-                    model_asset_path=os.path.join(
-                        self.pkg_share_dir, "config", "gesture_recognizer.task"
-                    ),
-                ),
-                num_hands=self.num_hands,  # Maximum number of hands to detect
-                min_hand_detection_confidence=self.min_detection_confidence,
-                min_tracking_confidence=self.min_tracking_confidence,
-            )
+        self.model = MediaPipeGesturesRecognizer(
+            model_path=os.path.join(
+                self.pkg_share_dir, "config", "gesture_recognizer.task"
+            ),
+            num_hands=self.num_hands,
+            min_det_conf=self.min_detection_confidence,
+            min_track_conf=self.min_tracking_confidence,
         )
+
         self.prev_image_msg = None
 
     def load_parameters(self) -> None:
@@ -122,11 +113,8 @@ class LandmarkDetectorNode(PluginBase):
             return
 
         img = self.bridge.imgmsg_to_cv2(self.received_image_msg, "rgb8")
-        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=img)
 
-        msg = helpers.serialize_gesture_recognizer_result(
-            self.gesture_recognizer.recognize(mp_image)
-        )
+        msg = helpers.serialize_gesture_recognizer_result(self.model.predict(img))
 
         if msg is None:
             return
