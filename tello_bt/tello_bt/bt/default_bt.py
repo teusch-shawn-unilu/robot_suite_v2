@@ -22,6 +22,7 @@ This is how the tree looks like:
 
 import py_trees
 from rclpy.node import Node
+from tello_bt.nodes.actions.gestures_interpreter_action import GesturesInterpreterAction
 from tello_bt.nodes.actions.land_action import LandAction
 from tello_bt.nodes.actions.remote_operator import RemoteOperator
 from tello_bt.nodes.conditionals.is_battery_low import IsBatteryLow
@@ -84,6 +85,9 @@ class DefaultBT(py_trees.composites.Sequence):
                         CanRunPlugin("CanRunHandGestures", "landmark_detector_node"),
                         PluginClient(
                             "HandGesturesPlugin", "landmark_detector_node", self.node
+                        ),
+                        GesturesInterpreterAction(
+                            "GesturesInterpreterAction", self.node
                         ),
                     ],
                 )
