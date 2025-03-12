@@ -30,6 +30,16 @@ RUN . /opt/ros/humble/setup.sh && colcon build
 RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 RUN echo "source /workspace/install/setup.bash" >> ~/.bashrc
 
+
+# Build Entrypoint
+
+RUN echo "#!/bin/bash" >> /entrypoint.sh \
+    && echo "source /opt/ros/humble/setup.bash" >> /entrypoint.sh \
+    && echo "source /workspace/install/setup.bash" >> /entrypoint.sh \
+    && echo 'exec "$@"' >> /entrypoint.sh \
+    && chmod a+x /entrypoint.sh
+
 WORKDIR /workspace/src/tello_suite
-RUN chmod 755 entryfile.sh
-ENTRYPOINT ["bash", "entryfile.sh"]
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["bash"]
