@@ -20,12 +20,12 @@ def get_wifi_networks():
             networks.append((wifi[0], False if wifi[1] == "--" else True))
             wifi_set.remove(wifi[0])
 
-    return jsonify(networks)
+    return jsonify({"networks": networks})
 
 @app.route("/get_connected_network")
 def get_connected_network():
     wifi = subprocess.check_output("nmcli -t -f active,ssid dev wifi | awk -F: '$1==\"yes\" {print $2}'", shell=True, text=True)
-    return jsonify({"network": wifi})
+    return jsonify({"network": wifi.split("\n")[0]})
 
 @app.route("/connect_wifi", methods=["POST"])
 def connect_wifi():
