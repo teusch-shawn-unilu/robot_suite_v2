@@ -8,30 +8,35 @@
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 body {
     font-family: 'Roboto', sans-serif;
+    height: 100vh;
+    width: 10vw;
 }
 
-.menu-bar {
+#menu-bar {
     display: none;
 }
 
-.menu {
+#menu {
     display: flex;
 }
 
 @media only screen and (max-width: 600px) {
-    .menu-bar {
+    #menu-bar {
         display: flex;
         justify-content: right;
         align-items: center;
         height: 15vh;
-        width: 95vw;
+        padding-right: 5vw;
+        width: 100vw;
+        background-color: beige;
     }
 
-    .menu {
+    #menu {
         position: absolute;
         width: 100vw;
         height: 100vh;
@@ -41,11 +46,14 @@ body {
         align-items: left;
         padding-top: 10vh;
         padding-left: 20vw;
-        gap: 8vh
+        gap: 8vh;
+        transform: translateX(-100vw);
+        transition: transform 0.75s ease-in-out;
+        background-color: aqua;
     }
 
-    .show {
-        transform: translate(100vw, 0);
+    #menu.show {
+        transform: translateX(0)
     }
   }
 
