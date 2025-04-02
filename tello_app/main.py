@@ -22,6 +22,11 @@ def get_wifi_networks():
 
     return jsonify(networks)
 
+@app.route("/get_connected_network")
+def get_connected_network():
+    wifi = subprocess.check_output("nmcli -t -f active,ssid dev wifi | awk -F: '$1==\"yes\" {print $2}'", shell=True, text=True)
+    return jsonify({"network": wifi})
+
 @app.route("/connect_wifi", methods=["POST"])
 def connect_wifi():
     if request.method == "POST":

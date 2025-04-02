@@ -1,5 +1,18 @@
-show_menu = document.getElementsByClassName("show-menu");
-hide_menu = document.getElementsByClassName("hide-menu");
-menu = document.getElementsByClassName("menu");
+import {WifiPage} from "/static/wifiPage.js"
 
-show_menu.setAttribute("onclick", menu.classList.toggle());
+document.addEventListener("DOMContentLoaded", function () {
+    const menu = document.getElementById("menu");
+    const showMenuBtn = document.getElementById("show-menu");
+    const hideMenuBtn = document.getElementById("hide-menu");
+  
+    showMenuBtn.addEventListener("click", function () {
+        menu.classList.toggle("show");
+    });
+
+    hideMenuBtn.addEventListener("click", function () {
+        menu.classList.toggle("show");
+    })
+  });
+
+var test = new WifiPage()
+//test.start()
