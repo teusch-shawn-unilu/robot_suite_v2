@@ -20,6 +20,7 @@ def get_wifi_networks():
             networks.append((wifi[0], False if wifi[1] == "--" else True))
             wifi_set.remove(wifi[0])
 
+    print(networks)
     return jsonify({"networks": networks})
 
 @app.route("/get_connected_network")

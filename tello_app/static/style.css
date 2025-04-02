@@ -23,6 +23,12 @@ body {
 
 #menu {
     display: flex;
+    flex-direction: column;
+    justify-content: top;
+    align-items: left;
+    padding-top: 10vh;
+    padding-left: 20vw;
+    gap: 8vh;
 }
 
 @media only screen and (max-width: 600px) {
@@ -40,20 +46,25 @@ body {
         position: absolute;
         width: 100vw;
         height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: top;
-        align-items: left;
-        padding-top: 10vh;
-        padding-left: 20vw;
-        gap: 8vh;
+        
         transform: translateX(-100vw);
         transition: transform 0.75s ease-in-out;
         background-color: aqua;
     }
 
     #menu.show {
-        transform: translateX(0)
+        transform: translateX(0);
+    }
+
+    .wifi-network {
+        width: 100vw;
+        height: 10vh;
+        padding-inline: 15vw;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 4vw;
     }
   }
 

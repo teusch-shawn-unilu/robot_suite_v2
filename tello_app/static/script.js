@@ -1,4 +1,5 @@
-import {WifiPage} from "/static/wifiPage.js"
+import { WifiPage } from "/static/wifiPage.js"
+import { MainPage } from "/static/mainPage.js"
 
 document.addEventListener("DOMContentLoaded", function () {
     const menu = document.getElementById("menu");
@@ -12,7 +13,31 @@ document.addEventListener("DOMContentLoaded", function () {
     hideMenuBtn.addEventListener("click", function () {
         menu.classList.toggle("show");
     })
-  });
+});
 
-var test = new WifiPage()
-//test.start()
+document.addEventListener("DOMContentLoaded", function () {
+    const menu = document.getElementById("menu");
+
+    const indexSectionBtn = document.getElementById("index-menu-btn");
+    const indexPage = new MainPage();
+    var currentPage = indexPage;
+
+    currentPage.start();
+
+    const wifiSectionBtn = document.getElementById("wifi-menu-btn");
+    const wifiPage = new WifiPage();
+
+    indexSectionBtn.addEventListener("click", function () {
+        currentPage.stop();
+        currentPage = indexPage;
+        currentPage.start()
+        menu.classList.toggle("show");
+    });
+
+    wifiSectionBtn.addEventListener("click", function () {
+        currentPage.stop();
+        currentPage = wifiPage;
+        currentPage.start();
+        menu.classList.toggle("show");
+    });
+});
