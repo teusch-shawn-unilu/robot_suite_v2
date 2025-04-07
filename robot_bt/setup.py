@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 import os
 from glob import glob
 
-package_name = "tello_bt"
+package_name = "robot_bt"
 
 setup(
     name=package_name,
@@ -18,10 +18,10 @@ setup(
     zip_safe=True,
     maintainer="snt-arg",
     maintainer_email="snt-arg@github.com",
-    description="A behavior tree for the tello suite",
+    description="A behavior tree for the robot suite",
     license="GPL-3.0",
     tests_require=["pytest"],
     entry_points={
-        "console_scripts": ["bt_server = tello_bt.bt_server_node:main"],
+        "console_scripts": ["bt_server = robot_bt.bt_server_node:main"],
     },
 )

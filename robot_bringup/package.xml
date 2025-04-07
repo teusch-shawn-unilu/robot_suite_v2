@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>tello_bringup</name>
+  <name>robot_bringup</name>
   <version>0.1.0</version>
-  <description>BringUp package for the tello suite.</description>
+  <description>BringUp package for the robot suite.</description>
   <maintainer email="snt-arg@github.com">snt-arg</maintainer>
   <license>GPL-3.0</license>
 
