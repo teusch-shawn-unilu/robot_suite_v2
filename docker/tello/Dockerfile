@@ -1,6 +1,6 @@
 FROM ros:humble
 
-# ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp 
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp 
 
 # Install necessary and useful packages
 RUN apt update && \
@@ -8,8 +8,12 @@ RUN apt update && \
     ssh vim python3-pip python3-vcstool wget git iputils-ping\
     ros-$ROS_DISTRO-cv-bridge ros-$ROS_DISTRO-rmw-cyclonedds-cpp 
 
-# Copy Tello Suite
-COPY . /workspace/src/tello_suite
+# Copy Robot Suite
+COPY . /workspace/src/robot_suite
+
+
+# Bring tello_ros2_driver pkg
+RUN git clone https://github.com/snt-arg/tello_ros2_driver.git /workspace/src/tello_driver
 
 # Install Tellopy
 WORKDIR /tmp
@@ -20,7 +24,7 @@ WORKDIR /tmp
 RUN rm -rf tellopy
 
 # Install PIP libaries
-WORKDIR /workspace/src/tello_suite
+WORKDIR /workspace/src/robot_suite
 RUN pip install -r requirements.txt
 
 # Colcon build + source
@@ -39,7 +43,7 @@ RUN echo "#!/bin/bash" >> /entrypoint.sh \
     && echo 'exec "$@"' >> /entrypoint.sh \
     && chmod a+x /entrypoint.sh
 
-WORKDIR /workspace/src/tello_suite
+WORKDIR /workspace/src/robot_suite
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["bash"]
