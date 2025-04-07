@@ -1,7 +1,7 @@
 from typing import Optional
 import random
 from rclpy.node import Publisher, Subscription
-from tello_bt.nodes import Action
+from robot_bt.nodes import Action
 from std_msgs.msg import Empty
 from geometry_msgs.msg import Twist
 import py_trees

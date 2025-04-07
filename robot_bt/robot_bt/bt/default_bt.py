@@ -22,14 +22,13 @@ This is how the tree looks like:
 
 import py_trees
 from rclpy.node import Node
-from tello_bt.nodes.actions.gestures_interpreter_action import GesturesInterpreterAction
-from tello_bt.nodes.actions.land_action import LandAction
-from tello_bt.nodes.actions.remote_operator import RemoteOperator
-from tello_bt.nodes.conditionals.is_battery_low import IsBatteryLow
-from tello_bt.nodes.conditionals.is_drone_connected import IsDroneConnected
-from tello_bt.nodes import PluginClient
-
-from tello_bt.nodes.conditionals.can_run_plugin import CanRunPlugin
+from robot_bt.nodes.actions.gestures_interpreter_action import GesturesInterpreterAction
+from robot_bt.nodes.actions.land_action import LandAction
+from robot_bt.nodes.actions.remote_operator import RemoteOperator
+from robot_bt.nodes.conditionals.is_battery_low import IsBatteryLow
+from robot_bt.nodes.conditionals.is_drone_connected import IsDroneConnected
+from robot_bt.nodes import PluginClient
+from robot_bt.nodes.conditionals.can_run_plugin import CanRunPlugin
 
 
 class DefaultBT(py_trees.composites.Sequence):

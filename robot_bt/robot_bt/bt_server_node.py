@@ -3,7 +3,7 @@ import py_trees
 from py_trees.trees import BehaviourTree
 from rclpy.logging import rclpy
 from rclpy.node import Node
-from tello_bt.bootstrap import bootstrap_bt, BootstrapError
+from robot_bt.bootstrap import bootstrap_bt, BootstrapError
 
 
 class BtServerNode(Node):

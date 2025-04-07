@@ -1,6 +1,6 @@
 # Plugin Server Base
 
-The `plugin_server_base` package serves as a bridge between the `tello_bt` framework and any custom plugins you create. It allows you to develop plugins independently, without requiring direct use of `tello_bt` or the `py-trees` library (which manages the behavior tree).
+The `plugin_server_base` package serves as a bridge between the `robot_bt` framework and any custom plugins you create. It allows you to develop plugins independently, without requiring direct use of `tello_bt` or the `py-trees` library (which manages the behavior tree).
 
 Essentially, this package provides a ROS 2 node with a preconfigured ROS 2 service, enabling the behavior tree to trigger the execution (or "ticking") of your plugin.
 

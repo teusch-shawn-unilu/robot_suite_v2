@@ -23,7 +23,7 @@ def bootstrap_bt(
 
     Args:
         file_name (str): Name of the file (without the `.py` extension) containing the
-                         `bootstrap` function within the `tello_bt.bt` package.
+                         `bootstrap` function within the `robot_bt.bt` package.
 
     Returns:
         Optional[Callable[[Node], py_trees.behaviour.Behaviour]]:
@@ -38,7 +38,7 @@ def bootstrap_bt(
     if file_name.find(".py") != -1:
         raise BootstrapError("File name contains .py extension.")
 
-    module_name = f"tello_bt.bt.{file_name}"
+    module_name = f"robot_bt.bt.{file_name}"
     try:
         module = importlib.import_module(module_name)
 

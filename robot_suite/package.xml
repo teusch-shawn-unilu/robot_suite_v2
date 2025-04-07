@@ -10,7 +10,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <exec_depend>tello_driver</exec_depend>
-  <exec_depend>tello_bt</exec_depend>
+  <exec_depend>robot_bt</exec_depend>
   <exec_depend>tello_msgs</exec_depend>
   <exec_depend>tello_nav</exec_depend>
   <exec_depend>tello_bringup</exec_depend>
