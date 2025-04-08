@@ -1,9 +1,10 @@
 services:
     tello_suite:
-        image: tello_suite:latest
+        image: robot_suite:tello
         container_name: tello_suite
         build:
             context: .
+            dockerfile: ./docker/tello/Dockerfile
         environment:
             - DISPLAY=${DISPLAY}
         volumes:
@@ -11,4 +12,4 @@ services:
         network_mode: "host"
         tty: true
         stdin_open: true
-        command: "ros2 launch tello_bringup system_launch.py"
+        command: "ros2 launch robot_bringup system_launch.py"
