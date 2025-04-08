@@ -1,0 +1,13 @@
+# Status
+uint8 FAILURE = 0
+uint8 RUNNING = 1
+uint8 SUCCESS = 2
+uint8 INVALID = 3
+
+# Request
+string blackboard # Json string 
+
+---
+# Result
+uint8 status
+string blackboard # Json string

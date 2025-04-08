@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>robot_interfaces</name>
+  <version>0.1.0</version>
+  <description>
+    The `robot_interfaces` package defines custom messages, services, and interfaces
+    that are used by various robot platforms within the `robot_suite`. It provides 
+    robot-agnostic communication protocols for interacting with robots, allowing 
+    for easy integration and extension of robot capabilities using ROS2.
+  </description>
+  <maintainer email="pmbs.123@gmail.com">pedros235</maintainer>
+  <license>GPL-3.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>rosidl_default_generators</depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
