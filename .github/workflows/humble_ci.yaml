@@ -32,11 +32,9 @@ jobs:
               uses: ros-tooling/action-ros-ci@v0.3
               with:
                   package-name: >
-                      tello_suite
-                      tello_driver
-                      tello_msgs
-                      tello_bringup
-                      tello_bt
+                      robot_suite
+                      robot_bringup
+                      robot_bt
                       tello_control_station
                       hand_gestures
                       plugin_server_base
