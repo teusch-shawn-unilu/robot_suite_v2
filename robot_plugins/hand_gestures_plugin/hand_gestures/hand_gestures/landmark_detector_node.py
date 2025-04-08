@@ -11,13 +11,13 @@ import hand_gestures.helpers as helpers
 
 from rclpy.publisher import Publisher
 from rclpy.subscription import Subscription
-from plugin_server_base.plugin_base import PluginBase, NodeState
+from plugin_base.plugin_base import PluginNode, NodeState
 from hand_gestures_msgs.msg import Landmarks
 from sensor_msgs.msg import Image
 from ament_index_python import get_package_share_directory
 
 
-class LandmarkDetectorNode(PluginBase):
+class LandmarkDetectorNode(PluginNode):
     """Node to detect hand landmakrs from an input image
 
     Subscriptions:

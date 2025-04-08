@@ -2,11 +2,11 @@ from setuptools import setup
 from glob import glob
 import os
 
-package_name = "plugin_server_base"
+package_name = "plugin_base"
 
 setup(
     name=package_name,
-    version="0.0.1",
+    version="1.0.0",
     packages=[package_name],
     data_files=[
         (
@@ -27,8 +27,6 @@ setup(
     license="MIT",
     tests_require=["pytest"],
     entry_points={
-        "console_scripts": [
-            "test_plugin = plugin_server_base.plugin_base:main"
-        ],
+        "console_scripts": ["test_plugin = plugin_base.plugin_base:main"],
     },
 )
