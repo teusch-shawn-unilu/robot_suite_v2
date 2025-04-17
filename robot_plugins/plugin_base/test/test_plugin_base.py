@@ -1,7 +1,7 @@
 import rclpy
 import unittest
-from plugin_server_base.plugin_base import PluginBase, NodeState
-from plugin_services.srv import PluginServer
+from plugin_base.plugin_base import PluginNode, NodeState
+from robot_interfaces.srv import PluginInterface
 from rclpy.client import Client
 
 PLUGIN_NAME = "test_plugin_base"
@@ -11,7 +11,7 @@ class TestPluginBase(unittest.TestCase):
     def setUp(self) -> None:
         rclpy.init()
 
-        self.node = PluginBase(PLUGIN_NAME)
+        self.node = PluginNode(PLUGIN_NAME)
 
         # Override the tick method for testing
         def tick_dummy(blackboard=None):
@@ -26,11 +26,11 @@ class TestPluginBase(unittest.TestCase):
 
     def test_bt_integration(self):
         """Test that tick method is called when the service is called"""
-        client = self.node.create_client(PluginServer, f"{PLUGIN_NAME}/bt_server")
+        client = self.node.create_client(PluginInterface, f"{PLUGIN_NAME}/bt_server")
 
         assert client.service_is_ready(), "Service Should have been ready"
 
-        request = PluginServer.Request()
+        request = PluginInterface.Request()
         future = client.call_async(request)
         rclpy.spin_until_future_complete(self.node, future)
 

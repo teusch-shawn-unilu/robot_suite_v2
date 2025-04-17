@@ -1,5 +1,5 @@
 import py_trees
-from plugin_services.srv import PluginServer
+from robot_interfaces.srv import PluginInterface
 from rclpy.node import Node
 from rclpy.client import Client
 from rclpy.logging import rclpy
@@ -23,10 +23,10 @@ class PluginClient(py_trees.behaviour.Behaviour):
 
     def setup(self) -> None:  # type: ignore
         self.client = self.node.create_client(
-            PluginServer, f"{self.plugin_name}/bt_server"
+            PluginInterface, f"{self.plugin_name}/bt_server"
         )
 
-    def _send_tick(self) -> PluginServer.Response | None:
+    def _send_tick(self) -> PluginInterface.Response | None:
         """Requests plugin to be ticked"""
         if not self.client.service_is_ready():
             self.node.get_logger().warning(
@@ -34,7 +34,7 @@ class PluginClient(py_trees.behaviour.Behaviour):
             )
             return None
 
-        request = PluginServer.Request()
+        request = PluginInterface.Request()
 
         # TODO: Send the blackboard information if set
         request.blackboard = "{}"
