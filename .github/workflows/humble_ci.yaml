@@ -24,9 +24,9 @@ jobs:
               with:
                   submodules: recursive
 
-            - name: Install py-trees dependency
+            - name: Install pip dependencies
               run: |
-                  pip install py-trees
+                  pip install py-trees typing-extensions
 
             - name: Build ROS 2 package
               uses: ros-tooling/action-ros-ci@v0.3
