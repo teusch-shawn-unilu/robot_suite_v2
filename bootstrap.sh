@@ -1,7 +1,5 @@
 #!/bin/bash
 
-LOG_FILE="boostrap.log"
-
 ROS_DISTROS=("iron" "humble" "foxy")
 
 # Colors
@@ -25,36 +23,12 @@ print_error(){
     echo -e "${BRed}[ERROR] -> ${Color_Off}${1}"
 }
 
-run_with_spinner() {
-    local cmd="$1"
-    local task_name="$2"
-
-    local spinner="|/-\\"
-    local pid
-
-    # Log the output of the command and run it in the background
-    $cmd >>"$LOG_FILE" 2>&1 &
-    pid=$!
-
-    local start_time=$(date +%s)
-    local elapsed_time=0
-    local i=0
-    local last_output=""
-
-    while kill -0 $pid 2>/dev/null; do
-        # Calculate elapsed time
-        elapsed_time=$(($(date +%s) - start_time))
-        # Get the last line of the command output
-        last_output=$(tail -n 1 "$LOG_FILE")
-
-        i=$(((i + 1) % ${#spinner}))
-        printf "\r[%c] %s | Elapsed: %d seconds | Last Output: %s" "${spinner:$i:1}" "$task_name" "$elapsed_time" "$last_output"
-        sleep 0.1
-    done
-
-    printf "\r[✔] %s\n" "$task_name"
+function run_as_root() {
+    if [[ $EUID -ne 0 ]]; then
+        log_error "This script must be run as root."
+        exit 1
+    fi
 }
-
 
 is_ros_distro_installed(){
     local dist_name=$1
@@ -143,23 +117,26 @@ fi
 is_ros_installed
 source "/opt/ros/${ros_distro}/setup.sh" >> /dev/null
 
+# Ensure this script is run as root
+run_as_root
+
 # Check if rosdep is installed
 if [ "$(command -v rosdep)" == "" ]; then
     print_warning "rosdep is not installed. Installing it..."
-    run_with_spinner "pip install rosdep" "Install rosdep"
-    run_with_spinner "sudo rosdep init" "Init update"
-    run_with_spinner "rosdep update" "Updating rosdep"
+    
+    pip install rosdep
+    sudo rosdep init
+    rosdep update
 else
-    run_with_spinner "rosdep update" "Updating rosdep"
+    print_info "rosdep is already installed. Updating it..."
+    rosdep update
 fi
 
-run_with_spinner "sudo apt install ros-humble-cv-bridge" "Install cv-bridge"
+print_info "Installing dependencies for ROS packages"
+rosdep install --from-paths src --ignore-src -y
 
-# run_with_spinner "rosdep install --from-paths src --ignore-src -y" "Install packages dependencies with rosdep"
+print_info "Installing dependencies for the project"
+pip install -r requirements.txt
 
-run_with_spinner "pip install -r requirements.txt" "Install python libraries from requirements.txt"
-
-run_with_spinner install_tellopy "Installing tellopy from source"
-
-
-rm $LOG_FILE
+print_info "Installing tellopy from source"
+install_tellopy 
