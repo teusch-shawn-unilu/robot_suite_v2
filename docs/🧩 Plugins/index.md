@@ -15,37 +15,15 @@ In the future, the selection of which plugin to run can be configured using a be
 
 As mentioned, a plugin is just a ROS2 package. You can create a new package under the `plugins` folder or import your own pre-existing package.
 
-When developing your plugin, you need to use the [plugin_server_base](../📦 Packages/plugin_server_base.md) package. This package provides a base class (`PluginBase`) for implementing plugins. Your node should look like this:
-
-!!! danger
-
-    You must implement the `tick` function. You can think of it as an inifite while loop. This function should not contain any inifinte loop inside!!
-
-!!! example
-
-    ```python
-    from plugin_server_base.plugin_base import PluginBase
-    from typing import Optional, Any
-
-    class MyNode(PluginBase):
-        def __init__(self, node_name: str):
-            super().__init__(node_name)
-
-            # Initialize your plugin here
-
-        def tick(self, blackboard: Optional[dict[str, Any]] = None):
-            # Implement the main logic of your plugin here
-            pass
-    ```
-
-For a more detailed explanation of plugin_server_base, refer to its [documentation](../📦 Packages/plugin_server_base.md).
+When developing your plugin, you need to use the [plugin_base](./1.plugin_base.md) package. This package provides a base class (`PluginNode`) for implementing plugins.
+Check the [Getting Started Section](./1.plugin_base.md#getting-started) for more details on how to use it.
 
 ## Frequently Asked Questions
 
-!!! question "Does my plugin need to have all its nodes based on `PluginBase`?"
+!!! question "Does my plugin need to have all its nodes based on `PluginNode`?"
 
-    No. If you have a main node that handles input and produces output, and your other nodes depend on its data, you do not need to base all nodes on `PluginBase`. Only the node interacting with the behavior tree (`robot_bt`) requires this.
+    No. If you have a main node that handles input and produces output, and your other nodes depend on its data, you do not need to base all nodes on `PluginNode`. Only the node interacting with the behavior tree (`robot_bt`) requires this.
 
-!!! question "When does my node strictly require the use of `PluginBase`?"
+!!! question "When does my node strictly require the use of `PluginNode`?"
 
-    If you want your node to be controlled by the behavior tree (`robot_bt`), you must base it on `PluginBase`. This ensures compatibility and control integration.
+    If you want your node to be controlled by the behavior tree (`robot_bt`), you must base it on `PluginNode`. This ensures compatibility and control integration.
