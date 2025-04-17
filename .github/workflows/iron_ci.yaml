@@ -37,5 +37,5 @@ jobs:
                       robot_bt
                       tello_control_station
                       hand_gestures
-                      plugin_server_base
+                      plugin_base
                   target-ros2-distro: iron
