@@ -12,6 +12,7 @@
   <depend>python3-typing-extension</depend>
 
   <test_depend>ament_cmake_pytest</test_depend>
+  <test_depend>python3-typing-extension</test_depend>
   <test_depend>launch_testing</test_depend>
   <test_depend>unittest</test_depend>
 
