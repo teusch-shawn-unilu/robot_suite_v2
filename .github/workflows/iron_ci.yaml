@@ -34,7 +34,6 @@ jobs:
                   package-name: >
                       robot_suite
                       robot_bringup
-                      robot_bt
                       tello_control_station
                       hand_gestures
                       plugin_base
