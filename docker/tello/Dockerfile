@@ -27,6 +27,11 @@ RUN rm -rf tellopy
 WORKDIR /workspace/src/robot_suite
 RUN pip install -r requirements.txt
 
+# Run rosdep
+WORKDIR /workspace
+RUN rosdep update && \
+    rosdep install --from-paths src --ignore-src -r -y
+
 # Colcon build + source
 WORKDIR /workspace
 RUN . /opt/ros/humble/setup.sh && colcon build
