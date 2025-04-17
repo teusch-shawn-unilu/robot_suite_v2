@@ -1,5 +1,5 @@
 from rclpy.node import Publisher
-from robot_bt.nodes import Action
+from robot_bt.behaviours.shared.actions import Action
 from std_msgs.msg import Empty
 import py_trees
 

@@ -1,4 +1,4 @@
-from robot_bt.nodes import Action
+from robot_bt.behaviours.shared.actions import Action
 import py_trees
 
 from sensor_msgs.msg import BatteryState
