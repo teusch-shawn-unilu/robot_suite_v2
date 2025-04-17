@@ -3,7 +3,7 @@ from std_msgs.msg import String, Empty
 from sensor_msgs.msg import Image
 from tello_msgs.msg import FlightStats
 from geometry_msgs.msg import Twist
-from plugin_server_base.plugin_base import NodeState
+from plugin_base.plugin_base import NodeState
 from tello_control_station.interface import Interface, matching_keys
 import math
 from typing import Union, Tuple

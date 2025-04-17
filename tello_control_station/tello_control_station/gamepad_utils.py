@@ -1,7 +1,7 @@
-import enum
+from enum import Enum
 
 
-class GamepadLogitechF710(enum):
+class GamepadLogitechF710(Enum):
     """Logitech F710 Gamepad Mapping"""
 
     # Buttons (Digital)
