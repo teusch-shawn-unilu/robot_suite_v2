@@ -10,8 +10,8 @@
   <depend>python3-pytrees</depend>
   <depend>python3-pygame</depend>
   <depend>rclpy</depend>
-  <depend>plugin_base_server</depend>
-  <depend>plugin_services</depend>
+  <depend>plugin_base</depend>
+  <depend>robot_interfaces</depend>
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
 

@@ -8,7 +8,7 @@
   <license>MIT</license>
 
   <depend>rclpy</depend>
-  <depend>plugin_services</depend>
+  <depend>robot_interfaces</depend>
 
   <test_depend>ament_cmake_pytest</test_depend>
   <test_depend>launch_testing</test_depend>
