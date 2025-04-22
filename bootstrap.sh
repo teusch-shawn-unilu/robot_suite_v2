@@ -25,7 +25,7 @@ print_error(){
 
 function run_as_root() {
     if [[ $EUID -ne 0 ]]; then
-        log_error "This script must be run as root."
+        print_error "This script must be run as root. [ sudo $0 ]"
         exit 1
     fi
 }
@@ -114,29 +114,67 @@ if [ "$(command -v pip)" == "" ]; then
 fi
 
 
-is_ros_installed
-source "/opt/ros/${ros_distro}/setup.sh" >> /dev/null
+function common_install(){
+    # Ensure this script is run as root
+    run_as_root
 
-# Ensure this script is run as root
-run_as_root
+    is_ros_installed
+    source "/opt/ros/${ros_distro}/setup.sh" >> /dev/null
 
-# Check if rosdep is installed
-if [ "$(command -v rosdep)" == "" ]; then
-    print_warning "rosdep is not installed. Installing it..."
-    
-    pip install rosdep
-    sudo rosdep init
-    rosdep update
-else
-    print_info "rosdep is already installed. Updating it..."
-    rosdep update
-fi
+    mkdir -p drivers/
 
-print_info "Installing dependencies for ROS packages"
-rosdep install --from-paths src --ignore-src -y
+    # Check if rosdep is installed
+    if [ "$(command -v rosdep)" == "" ]; then
+        print_warning "rosdep is not installed. Installing it..."
+        
+        pip install rosdep
+        sudo rosdep init
+        rosdep update
+    else
+        print_info "rosdep is already installed. Updating it..."
+        rosdep update
+    fi
 
-print_info "Installing dependencies for the project"
-pip install -r requirements.txt
+    print_info "Installing dependencies for ROS packages"
+    rosdep install --from-paths src --ignore-src -y
 
-print_info "Installing tellopy from source"
-install_tellopy 
+    print_info "Installing dependencies for the project"
+    pip install -r requirements.txt
+}
+
+function tello_install(){
+    print_info "Installing tellopy from source"
+    install_tellopy 
+
+    print_info "Clonning tello_ros2_driver into drivers/"
+    git clone https://github.com/snt-arg/tello_ros2_driver.git drivers/tello_ros2_driver
+}
+
+
+case "$1" in
+tello)
+    common_install 
+    tello_install
+
+    print_info "Building suite"
+    colcon build --symlink-install
+    ;;
+spot)
+    echo "Not yet supported,"
+    exit 1
+    common_install 
+    print_info "Building suite"
+    colcon build --symlink-install
+    ;;
+unitree_go1)
+    echo "Not yet supported,"
+    exit 1
+    common_install 
+    print_info "Building suite"
+    colcon build --symlink-install
+    ;;
+*)
+    echo "Unknown robot: $1."
+    exit 1
+    ;;
+esac
