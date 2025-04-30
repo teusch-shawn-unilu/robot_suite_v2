@@ -1,4 +1,4 @@
-# 🤝 Contributing Guide
+# Contributing Guide
 
 Thank you for considering contributing to our project! This guide will help you understand the contribution workflow and best practices to follow.
 
