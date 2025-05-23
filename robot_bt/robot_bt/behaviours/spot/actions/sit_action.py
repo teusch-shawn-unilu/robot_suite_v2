@@ -1,19 +1,22 @@
-from rclpy.node import Publisher
+import rclpy
 from robot_bt.behaviours.shared.actions import Action
-from std_msgs.msg import Empty
-import py_trees
-
+from bosdyn.client.robot_command import RobotCommandBuilder
 
 class SitAction(Action):
     """
-    If battery is low, command Spot to sit (instead of Tello’s land).
+    Tell Spot to sit when invoked by the BT.
     """
-    sit_topic: str = "/sit"
-    sit_pub: Publisher
+    def __init__(self, node: rclpy.node.Node, name: str = "SitAction"):
+        super().__init__(node, name)
 
-    def setup(self) -> None:
-        self.sit_pub = self.node.create_publisher(Empty, self.sit_topic, 1)
+        self._cmd_client = self._bosdyn_robot.ensure_client('robot-command')
 
-    def update(self) -> py_trees.common.Status:
-        self.sit_pub.publish(Empty())
-        return py_trees.common.Status.SUCCESS
+    # ----------------------------------------------------------------
+    def update(self) -> Action.Status:
+        try:
+            sit_cmd = RobotCommandBuilder.synchro_sit_command()
+            self._cmd_client.robot_command(sit_cmd)
+            return Action.Status.SUCCESS
+        except Exception as exc:
+            self.node.get_logger().error(f"Sit failed: {exc}")
+            return Action.Status.FAILURE

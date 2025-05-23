@@ -21,3 +21,7 @@ class IsBatteryLow(Action):
         if self.current_battery < self.low_battery_threshold:
             return py_trees.common.Status.SUCCESS
         return py_trees.common.Status.FAILURE
+
+
+# Link for a Spot example using Spot-specific code for the battery state:
+# https://github.com/bdaiinstitute/spot_ros2/blob/main/spot_examples/spot_examples/wasd.py

@@ -2,7 +2,7 @@ import py_trees
 
 
 class CanRunPlugin(py_trees.behaviour.Behaviour):
-    """A helper class to check whether a plugin is seletec to run.
+    """A helper class to check whether a plugin is selected to run.
 
     Uses the blackboard with name PluginsBlackboard, where it has
     a key selected_plugin. If the value is the plugin_name, it returns

@@ -9,7 +9,7 @@ from robot_bt.bootstrap import bootstrap_bt
 
 class BtServerNode(Node):
     _bt_tick_freq: int = 60  # Hz
-    _bt_name: str = "default_bt"
+    _bt_name: str = "spot_bt"
     _stop_on_failure: bool = False
     bt: Optional[BehaviourTree]
 

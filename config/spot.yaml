@@ -1,0 +1,9 @@
+# Topics/services exposed by the Spot ROS 2 driver (docker)
+robot:
+  battery_topic:   /spot/status/battery_state
+  cmd_vel_topic:   /cmd_vel
+  image_topic:     /spot/camera/frontleft/image/compressed
+
+bt:
+  name: spot_bt           # behaviour‑tree file (see robot_bt/bt/)
+  battery_low_threshold: 0.20

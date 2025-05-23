@@ -30,17 +30,13 @@ class GesturesInterpreterAction(Action):
         self.takeoff_pub = self.node.create_publisher(Empty, self.takeoff_topic, 1)
         self.flip_pub = self.node.create_publisher(FlipControl, self.flip_topic, 1)
         self.cmd_pub = self.node.create_publisher(Twist, self.cmd_topic, 10)
-        self.landmarks_sub = self.node.create_subscription(
-            Landmarks, self.landmarks_topic, self.landmarks_callback, 10
-        )
+        self.landmarks_sub = self.node.create_subscription(Landmarks, self.landmarks_topic, self.landmarks_callback, 10)
 
     def landmarks_callback(self, msg: Landmarks) -> None:
         self.last_landmark_recv = msg
 
     def nbr_hands_detected(self, msg: Landmarks) -> int:
-        return int(msg.right_hand.handedness != "") + int(
-            msg.left_hand.handedness != ""
-        )
+        return int(msg.right_hand.handedness != "") + int(msg.left_hand.handedness != "")
 
     def can_takeoff(self, msg: Landmarks) -> bool:
         if self.nbr_hands_detected(msg) != 1:

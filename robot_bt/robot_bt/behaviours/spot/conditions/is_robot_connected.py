@@ -5,9 +5,8 @@ import subprocess
 class IsRobotConnected(py_trees.behaviour.Behaviour):
     """
     Checks if the Spot robot is reachable via ping.
-    This mirrors the Tello connectivity check but with a placeholder IP.
     """
-    _ip_address: str = "192.168.0.1"  # TODO: set Spot’s actual IP
+    _ip_address: str = "192.168.80.3"  # TODO: set Spot’s actual IP
 
     def setup(self):
         pass
