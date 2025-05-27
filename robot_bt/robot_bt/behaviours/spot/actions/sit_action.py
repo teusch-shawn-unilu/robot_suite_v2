@@ -1,6 +1,8 @@
 import rclpy
 from robot_bt.behaviours.shared.actions import Action
-from bosdyn.client.robot_command import RobotCommandBuilder
+from std_srvs.srv import Trigger
+import py_trees
+
 
 class SitAction(Action):
     """
@@ -9,14 +11,13 @@ class SitAction(Action):
     def __init__(self, node: rclpy.node.Node, name: str = "SitAction"):
         super().__init__(node, name)
 
-        self._cmd_client = self._bosdyn_robot.ensure_client('robot-command')
+        self.sit_client = self.create_client(Trigger, "/sit")
 
     # ----------------------------------------------------------------
-    def update(self) -> Action.Status:
+    def update(self) -> py_trees.common.Status:
         try:
-            sit_cmd = RobotCommandBuilder.synchro_sit_command()
-            self._cmd_client.robot_command(sit_cmd)
-            return Action.Status.SUCCESS
+            self.sit_client.call_async(Trigger.Request())
+            return py_trees.common.Status.SUCCESS
         except Exception as exc:
             self.node.get_logger().error(f"Sit failed: {exc}")
-            return Action.Status.FAILURE
+            return py_trees.common.Status.SUCCESS

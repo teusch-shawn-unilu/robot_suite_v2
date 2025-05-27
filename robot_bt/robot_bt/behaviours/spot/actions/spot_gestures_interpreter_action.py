@@ -1,10 +1,12 @@
 from robot_bt.behaviours.shared.actions import Action
 from typing import Optional
 import time
+import rclpy
 
 import py_trees
 from rclpy.node import Node
 from std_srvs.srv import Trigger
+from geometry_msgs.msg import Twist
 from hand_gestures_msgs.msg import Landmarks
 # from bosdyn.client.frame_helpers import GRAV_ALIGNED_BODY_FRAME_NAME, ODOM_FRAME_NAME
 # from spot_msgs.action import RobotCommand
@@ -15,7 +17,10 @@ from hand_gestures_msgs.msg import Landmarks
 
 class SpotGesturesInterpreterAction(Action):
 
+    landmarks_topic: str = "/hand/landmarks"
+
     def __init__(self, robot_name: Optional[str] = None, node: Optional[Node] = None) -> None:
+        super().__init__(name="SpotGesturesInterpreterAction", bt_node=node)
         if self.node is None:
             raise ValueError("no ROS 2 node available.")
         
@@ -24,20 +29,23 @@ class SpotGesturesInterpreterAction(Action):
         # self.odom_frame_name = namespace_with(robot_name, ODOM_FRAME_NAME)
         # self.grav_aligned_body_frame_name = namespace_with(robot_name, GRAV_ALIGNED_BODY_FRAME_NAME)
 
-        self.landmarks_sub = self.node.create_subscription(Landmarks, self.landmarks_topic, self.landmarks_callback, 10)
-        self.cmd_pub = self.node.create_publisher(Twist, self.cmd_topic, 10)
+        self.node.create_subscription(Landmarks, "/hand/landmarks", self.landmarks_callback, 10)
 
         # Trigger commands for the Spot robot to do a preprogrammed action
-        self.stand_client = self.create_client(Trigger, "/stand")
-        self.sit_client = self.create_client(Trigger, "/sit")
+        self.stand_client = node.create_client(Trigger, "/stand")
+        self.sit_client = node.create_client(Trigger, "/sit")
+        
+        self.cmd_pub = self.node.create_publisher(Twist, "/cmd_vel", 10)
+
+        self.cmd_vel = Twist()
         # self.cmd_sit = self.node.create_client(Trigger, namespace_with(robot_name, "sit"))
         # self.cmd_stand = self.node.create_client(Trigger, namespace_with(robot_name, "stand"))
 
         # Wrapper to accept Strings as commands for Spot. 
         # SimpleSpotCommander executes the commands while the ActionClientWrapper accepts String and 
         # transforms them into the correct command
-        self.robot = SimpleSpotCommander(robot_name, node)
-        self.robot_command_client = ActionClientWrapper(RobotCommand, namespace_with(robot_name, "robot_command"), node)
+        # self.robot = SimpleSpotCommander(robot_name, node)
+        # self.robot_command_client = ActionClientWrapper(RobotCommand, namespace_with(robot_name, "robot_command"), node)
 
 
     # detects the number of hands present on the image and returns the number of hands
@@ -61,7 +69,7 @@ class SpotGesturesInterpreterAction(Action):
 
         # Power on robot
         self.logger.info("Powering on robot")
-        result = self.robot.command("power_on")
+        -result = self.robot.command("power_on")
         if not result.success:
             self.logger.error("Unable to power on robot message was " + result.message)
             return False
@@ -225,27 +233,27 @@ class SpotGesturesInterpreterAction(Action):
     # def move(self, cmd: Twist) -> None:
     #     self.cmd_pub.publish(cmd)
 
-    # def update(self) -> py_trees.common.Status:
-    #     if self.last_landmark_recv is None:
-    #         return py_trees.common.Status.FAILURE
+    def update(self) -> py_trees.common.Status:
+        if self.last_landmark_recv is None:
+            return py_trees.common.Status.FAILURE
 
-    #     landmark_msg = self.last_landmark_recv
+        landmark_msg = self.last_landmark_recv
 
-    #     if self.can_takeoff(landmark_msg):
-    #         self.takeoff()
-    #         return py_trees.common.Status.SUCCESS
+        if self.can_takeoff(landmark_msg):
+            self.takeoff()
+            return py_trees.common.Status.SUCCESS
 
-    #     if self.can_land(landmark_msg):
-    #         self.land()
-    #         return py_trees.common.Status.SUCCESS
+        if self.can_land(landmark_msg):
+            self.land()
+            return py_trees.common.Status.SUCCESS
 
-    #     if self.can_flip(landmark_msg):
-    #         self.flip()
-    #         return py_trees.common.Status.SUCCESS
+        if self.can_flip(landmark_msg):
+            self.flip()
+            return py_trees.common.Status.SUCCESS
 
-    #     mouvement = self.build_move(landmark_msg)
-    #     if mouvement is None:
-    #         return py_trees.common.Status.FAILURE
+        mouvement = self.build_move(landmark_msg)
+        if mouvement is None:
+            return py_trees.common.Status.FAILURE
 
-    #     self.move(mouvement)
-    #     return py_trees.common.Status.SUCCESS
+        self.move(mouvement)
+        return py_trees.common.Status.SUCCESS

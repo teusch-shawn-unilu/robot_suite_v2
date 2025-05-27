@@ -4,8 +4,7 @@ from robot_bt.behaviours.spot.conditions import IsRobotConnected
 
 import py_trees
 from rclpy.node import Node
-from robot_bt.behaviours.spot.actions import SitAction
-from robot_bt.behaviours.spot.actions import RemoteOperator
+#from robot_bt.behaviours.spot.actions import SitAction
 from robot_bt.behaviours.spot.actions import SpotGesturesInterpreterAction
 
 """Default BT which can be used as an example.
@@ -57,13 +56,11 @@ class SpotBT(py_trees.composites.Sequence):
                 py_trees.decorators.Inverter(
                     "IsBAtteryLowInverter", IsBatteryLow("IsBatteryLow", self.node)
                 ),
-                py_trees.decorators.Inverter(
-                    "SitActionInverter", SitAction("SitAction", self.node)
-                ),
+                # py_trees.decorators.Inverter(
+                #     "SitActionInverter", SitAction("SitAction", self.node)
+                # ),
             ],
         )
-
-        remote_operator = RemoteOperator("RemoteOperator", self.node)
 
         plugins = py_trees.composites.Selector(
             "Plugins",
@@ -85,8 +82,8 @@ class SpotBT(py_trees.composites.Sequence):
             ],
         )
 
-        #, battery_checker
-        self.add_children([robot_connection, remote_operator, plugins])
+        #, battery_checker, remote_operator,
+        self.add_children([robot_connection, battery_checker, plugins])
 
 
 def bootstrap(ros_node: Node) -> py_trees.behaviour.Behaviour:
