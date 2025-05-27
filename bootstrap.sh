@@ -150,6 +150,20 @@ function tello_install(){
     git clone https://github.com/snt-arg/tello_ros2_driver.git drivers/tello_ros2_driver
 }
 
+function spot_install(){
+    print_info ""
+    
+    git clone --recurse-submodules https://github.com/bdaiinstitute/spot_ros2.git drivers/spot_ros2
+    
+    pushd drivers/spot_ros2
+    ./install_spot_ros2.sh
+    # ./install_spot_ros2.sh --arm64
+    popd 
+
+
+
+}
+
 
 case "$1" in
 tello)
@@ -160,9 +174,8 @@ tello)
     colcon build --symlink-install
     ;;
 spot)
-    echo "Not yet supported,"
-    exit 1
-    common_install 
+    common_install
+    spot_install
     print_info "Building suite"
     colcon build --symlink-install
     ;;
