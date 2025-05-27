@@ -69,7 +69,7 @@ class SpotGesturesInterpreterAction(Action):
 
         # Power on robot
         self.logger.info("Powering on robot")
-        -result = self.robot.command("power_on")
+        result = self.robot.command("power_on")
         if not result.success:
             self.logger.error("Unable to power on robot message was " + result.message)
             return False
