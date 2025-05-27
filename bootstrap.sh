@@ -153,15 +153,12 @@ function tello_install(){
 function spot_install(){
     print_info ""
     
-    git clone --recurse-submodules https://github.com/bdaiinstitute/spot_ros2.git drivers/spot_ros2
+    git clone --recurse-submodules https://github.com/teusch-shawn-unilu/spot_ros2.git drivers/spot_ros2
     
     pushd drivers/spot_ros2
     ./install_spot_ros2.sh
     # ./install_spot_ros2.sh --arm64
     popd 
-
-
-
 }
 
 
