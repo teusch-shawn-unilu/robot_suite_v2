@@ -2,7 +2,7 @@
 robot:
   battery_topic:   /spot/status/battery_state
   cmd_vel_topic:   /cmd_vel
-  image_topic:     /spot/camera/frontleft/image/compressed
+  image_topic:     /camera/image_raw # /spot/camera/frontleft/image/compressed
 
 bt:
   name: spot_bt           # behaviour‑tree file (see robot_bt/bt/)
