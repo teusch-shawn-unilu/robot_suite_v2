@@ -126,6 +126,7 @@ class LandmarkDetectorNode(PluginNode):
     def tick(self, blackboard: Optional[dict["str", Any]] = None) -> NodeState:
         try:
             self._process_image()
+            print("test")
         except Exception as e:
             self.get_logger().error(f"Error processing frame: {e}")
             return NodeState.FAILURE

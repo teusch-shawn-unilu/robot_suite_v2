@@ -1,6 +1,6 @@
 from robot_bt.behaviours.shared.actions import PluginClient
-from robot_bt.behaviours.shared.conditions import CanRunPlugin, IsBatteryLow
-from robot_bt.behaviours.spot.conditions import IsRobotConnected
+from robot_bt.behaviours.shared.conditions import CanRunPlugin
+from robot_bt.behaviours.spot.conditions import IsRobotConnected, IsBatteryLow
 
 import py_trees
 from rclpy.node import Node
@@ -70,7 +70,6 @@ class SpotBT(py_trees.composites.Sequence):
                     "HandGesturesControl",
                     memory=False,
                     children=[
-                        CanRunPlugin("CanRunHandGestures", "landmark_detector_node"),
                         PluginClient(
                             "HandGesturesPlugin", "landmark_detector_node", self.node
                         ),
