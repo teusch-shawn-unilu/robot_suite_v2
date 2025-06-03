@@ -18,8 +18,9 @@ from ultralytics import YOLO
 
 class SpotObjectRecognitionNode(Node):
     """
-    Subscribes to /camera/image_raw, runs YOLOv8 (CPU), and writes each unique object label
-    to a CSV (no duplicates). If the CSV already exists, reads existing labels at startup to avoid re‐logging.
+    Subscribes to /camera/image_raw, runs YOLOv8 (CPU), writes each unique object label
+    to a CSV (no duplicates), and republishes an annotated image topic with bounding boxes
+    and confidence percentages.
     """
 
     def __init__(self):
@@ -36,6 +37,8 @@ class SpotObjectRecognitionNode(Node):
         self.declare_parameter('detection_skip', 10)
         # CSV file path (will store unique labels, one per line)
         self.declare_parameter('csv_path', os.path.expanduser('~/Documents/spot/robot_suite_v2/detected_objects.csv'))
+        # Topic to publish annotated images
+        self.declare_parameter('annotated_topic', '/camera/annotated_image')
 
         camera_topic = self.get_parameter('camera_topic').get_parameter_value().string_value
         model_path = os.path.expanduser(
@@ -45,6 +48,7 @@ class SpotObjectRecognitionNode(Node):
         self.detection_skip = self.get_parameter('detection_skip').get_parameter_value().integer_value
         csv_path_raw = self.get_parameter('csv_path').get_parameter_value().string_value
         self.csv_path = os.path.expanduser(csv_path_raw)
+        annotated_topic = self.get_parameter('annotated_topic').get_parameter_value().string_value
 
         # --- Load YOLOv8 model (CPU) ---
         if not os.path.exists(model_path):
@@ -56,7 +60,6 @@ class SpotObjectRecognitionNode(Node):
 
         # Prepare CvBridge
         self.bridge = CvBridge()
-        self.camera = cv2.VideoCapture(0)
 
         # Maintain a set of all labels ever logged
         self.unique_labels = set()
@@ -98,6 +101,9 @@ class SpotObjectRecognitionNode(Node):
             10
         )
 
+        # Publisher for annotated images
+        self.annotated_publisher = self.create_publisher(Image, annotated_topic, 10)
+
         self.get_logger().info('ObjectRecognitionNode initialized, waiting for images...')
 
         # Lock to prevent concurrent writes to CSV
@@ -116,16 +122,65 @@ class SpotObjectRecognitionNode(Node):
             self.get_logger().error(f"cv_bridge error: {e}")
             return
 
-        # Run YOLOv8 inference (returns a list of results; we take [0] since single image)
-        results = None
+        # Run YOLOv8 inference (returns a list of results; take [0] since single image)
         try:
             results = self.model(cv_image)[0]
         except Exception as e:
             self.get_logger().error(f"YOLO inference failed: {e}")
             return
 
-        # For each detection: check confidence & label
-        # YOLOv8 results.boxes: .xyxy, .conf, .cls
+        # Prepare to draw bounding boxes
+        # Results: .boxes.xyxy (coordinates), .boxes.conf (confidence), .boxes.cls (class index)
+        for box, conf_tensor, cls_tensor in zip(results.boxes.xyxy, results.boxes.conf, results.boxes.cls):
+            confidence = float(conf_tensor.cpu().numpy())
+            if confidence < self.conf_thresh:
+                continue
+
+            class_idx = int(cls_tensor.cpu().numpy())
+            label = self.model.names[class_idx] if class_idx < len(self.model.names) else f"class_{class_idx}"
+
+            # Extract bounding box coordinates
+            x1, y1, x2, y2 = box.cpu().numpy().astype(int)
+
+            # Draw rectangle
+            cv2.rectangle(cv_image, (x1, y1), (x2, y2), color=(0, 255, 0), thickness=2)
+
+            # Prepare label text with confidence percentage
+            text = f"{label} {confidence * 100:.1f}%"
+
+            # Determine text size & baseline
+            (text_width, text_height), baseline = cv2.getTextSize(
+                text, cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.5, thickness=1
+            )
+
+            # Draw filled rectangle behind text for readability
+            cv2.rectangle(
+                cv_image,
+                (x1, y1 - text_height - baseline - 4),
+                (x1 + text_width + 2, y1),
+                color=(0, 255, 0),
+                thickness=-1
+            )
+
+            # Put text (label + confidence) above the box
+            cv2.putText(
+                cv_image,
+                text,
+                (x1 + 1, y1 - baseline - 2),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                (0, 0, 0),
+                thickness=1
+            )
+
+        # Publish annotated image
+        try:
+            annotated_msg = self.bridge.cv2_to_imgmsg(cv_image, encoding='bgr8')
+            self.annotated_publisher.publish(annotated_msg)
+        except Exception as e:
+            self.get_logger().error(f"Failed to publish annotated image: {e}")
+
+        # For each detection: check confidence & label, and log new labels to CSV
         new_labels = []
         for box, conf_tensor, cls_tensor in zip(results.boxes.xyxy, results.boxes.conf, results.boxes.cls):
             confidence = float(conf_tensor.cpu().numpy())
@@ -141,7 +196,6 @@ class SpotObjectRecognitionNode(Node):
 
         # If any brand-new labels found, append them to CSV
         if new_labels:
-            # Acquire lock before writing
             with self.csv_lock:
                 try:
                     with open(self.csv_path, 'a', newline='') as csvfile:
