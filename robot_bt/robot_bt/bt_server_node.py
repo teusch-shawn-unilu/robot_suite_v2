@@ -117,7 +117,6 @@ class BtServerNode(Node):
             bootstrap_fn = bootstrap_bt(self._bt_name)
             self.get_logger().info(f"{self._bt_name} has been bootstrapped")
             self.bt = BehaviourTree(root=bootstrap_fn(self))
-            print("test")
             self.bt.setup()
         except Exception as e:
             self.get_logger().error(f"Unable to bootstrap BT -> {self._bt_name}")

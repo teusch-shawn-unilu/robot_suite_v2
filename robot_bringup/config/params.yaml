@@ -2,7 +2,7 @@ landmark_detector_node:
   ros__parameters:
     standalone: false
     tick_rate: 30 # Hz
-    img_input_topic: "/camera/image_raw"
+    img_input_topic: "/camera/camera/color/image_raw"
     landmarks_topic: "/hand/landmarks"
     num_hands: 4
     min_detection_confidence: 0.5
@@ -10,7 +10,7 @@ landmark_detector_node:
 
 landmark_annotator_node:
   ros__parameters:
-    img_input_topic: "/camera/image_raw"
+    img_input_topic: "/camera/camera/color/image_raw"
     landmarks_topic: "/hand/landmarks"
     annotated_img_topic: "/hand/annotated/image"
 
