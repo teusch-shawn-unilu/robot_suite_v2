@@ -150,13 +150,13 @@ class BtServerNode(Node):
                 )
                 time.sleep(5)
                 continue
-            try:
-                self.bt.tick(post_tick_handler=self.print_tree)
-            except Exception as e:
-                self.get_logger().error(
-                    f"A problem occured while ticking BT. Root Cause: {e}"
-                )
-                break
+            # try:
+            #     self.bt.tick(post_tick_handler=self.print_tree)
+            # except Exception as e:
+            #     self.get_logger().error(
+            #         f"A problem occured while ticking BT. Root Cause: {e}"
+            #     )
+            #     break
             if (
                 self.bt.root.status == py_trees.common.Status.FAILURE
                 and self._stop_on_failure
