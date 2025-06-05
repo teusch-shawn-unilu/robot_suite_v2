@@ -18,7 +18,7 @@ from ultralytics import YOLO
 
 class SpotObjectRecognitionNode(Node):
     """
-    Subscribes to /camera/image_raw, runs YOLOv8 (CPU), writes each unique object label
+    Subscribes to /camera/image_raw, runs YOLOv8 (CPU), writes each unique object object
     to a CSV (no duplicates), and republishes an annotated image topic with bounding boxes
     and confidence percentages.
     """
@@ -71,7 +71,7 @@ class SpotObjectRecognitionNode(Node):
                     reader = csv.reader(csvfile)
                     # If there's a header, skip it
                     rows = list(reader)
-                    if rows and rows[0] == ['label']:
+                    if rows and rows[0] == ['object']:
                         rows = rows[1:]
                     for row in rows:
                         if row:
@@ -84,7 +84,7 @@ class SpotObjectRecognitionNode(Node):
             try:
                 with open(self.csv_path, 'w', newline='') as csvfile:
                     writer = csv.writer(csvfile)
-                    writer.writerow(['label'])
+                    writer.writerow(['object'])
                 self.get_logger().info(f"Created new CSV at {self.csv_path}")
             except Exception as e:
                 self.get_logger().error(f"Cannot create CSV file at {self.csv_path}: {e}")
@@ -137,7 +137,7 @@ class SpotObjectRecognitionNode(Node):
                 continue
 
             class_idx = int(cls_tensor.cpu().numpy())
-            label = self.model.names[class_idx] if class_idx < len(self.model.names) else f"class_{class_idx}"
+            object = self.model.names[class_idx] if class_idx < len(self.model.names) else f"class_{class_idx}"
 
             # Extract bounding box coordinates
             x1, y1, x2, y2 = box.cpu().numpy().astype(int)
@@ -145,8 +145,8 @@ class SpotObjectRecognitionNode(Node):
             # Draw rectangle
             cv2.rectangle(cv_image, (x1, y1), (x2, y2), color=(0, 255, 0), thickness=2)
 
-            # Prepare label text with confidence percentage
-            text = f"{label} {confidence * 100:.1f}%"
+            # Prepare object text with confidence percentage
+            text = f"{object} {confidence * 100:.1f}%"
 
             # Determine text size & baseline
             (text_width, text_height), baseline = cv2.getTextSize(
@@ -162,7 +162,7 @@ class SpotObjectRecognitionNode(Node):
                 thickness=-1
             )
 
-            # Put text (label + confidence) above the box
+            # Put text (object + confidence) above the box
             cv2.putText(
                 cv_image,
                 text,
@@ -180,7 +180,7 @@ class SpotObjectRecognitionNode(Node):
         except Exception as e:
             self.get_logger().error(f"Failed to publish annotated image: {e}")
 
-        # For each detection: check confidence & label, and log new labels to CSV
+        # For each detection: check confidence & object, and log new labels to CSV
         new_labels = []
         for box, conf_tensor, cls_tensor in zip(results.boxes.xyxy, results.boxes.conf, results.boxes.cls):
             confidence = float(conf_tensor.cpu().numpy())
@@ -188,11 +188,11 @@ class SpotObjectRecognitionNode(Node):
                 continue
 
             class_idx = int(cls_tensor.cpu().numpy())
-            label = self.model.names[class_idx] if class_idx < len(self.model.names) else f"class_{class_idx}"
+            object = self.model.names[class_idx] if class_idx < len(self.model.names) else f"class_{class_idx}"
 
-            # If this label is new, add to new_labels
-            if label not in self.unique_labels:
-                new_labels.append(label)
+            # If this object is new, add to new_labels
+            if object not in self.unique_labels:
+                new_labels.append(object)
 
         # If any brand-new labels found, append them to CSV
         if new_labels:

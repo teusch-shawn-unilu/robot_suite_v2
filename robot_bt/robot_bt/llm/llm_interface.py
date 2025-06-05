@@ -11,7 +11,6 @@ class LLMPlugin(PluginNode):
         super().__init__("llm_plugin")
         self.declare_parameter("model", "gpt-3.5-turbo")
         self.declare_parameter("apikey", os.getenv("OPENAI_API_KEY", ""))
-        openai.api_key = self.get_parameter("apikey").value
         self._model = self.get_parameter("model").value
 
         self.srv = self.create_service(
