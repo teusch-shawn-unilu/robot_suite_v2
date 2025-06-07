@@ -6,9 +6,9 @@ from spot_msgs.msg import BatteryStateArray
 
 class IsBatteryLow(Action):
     battery_topic: str = "/byte/status/battery_states"
-    low_battery_threshold: float = 5
+    low_battery_threshold: float = 20
 
-    def setup(self) -> None:  # type: ignore
+    def setup(self) -> None:
         self.current_battery = -1
         self.battery_sub = self.node.create_subscription(
             BatteryStateArray, self.battery_topic, self.battery_callback, 1

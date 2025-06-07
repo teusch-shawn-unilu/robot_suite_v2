@@ -38,7 +38,6 @@ class SpotGesturesInterpreterAction(Action):
         self.last_landmark_recv = None
 
         self.cmd_vel = Twist()
-        # TODO: We can first check the state from spot ros if it is sitted
         self.is_sitted = False
 
     def landmarks_callback(self, msg: Landmarks):

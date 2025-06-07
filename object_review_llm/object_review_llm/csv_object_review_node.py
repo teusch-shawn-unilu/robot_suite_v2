@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 import json
 import pandas as pd
@@ -9,19 +8,6 @@ from rclpy.node import Node
 from dotenv import load_dotenv
 from openai import OpenAI
 
-# -----------------------------------------------------------------------------
-# This ROS2 node implements a chat interface (via OpenAI's Chat API) that
-# continuously lets the user add, rename, or remove objects from a CSV file.
-# The CSV is expected to have at least a column named "object". Each time the
-# user issues a free-form instruction, the node asks GPT-4 to decide whether
-# to call one of three functions (remove_objects, rename_object, add_object).
-# After applying that function to the CSV, GPT-4 acknowledges, and the chat
-# remains open for further edits. ROS2 is used solely for parameter passing
-# (e.g., csv_path) and node startup/shutdown; all terminal I/O is done with
-# print()/input().
-# -----------------------------------------------------------------------------
-
-# Load OpenAI API key from .env (or environment)
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
@@ -29,10 +15,8 @@ if not OPENAI_API_KEY:
     print("Error: OPENAI_API_KEY not found in environment or .env.")
     exit(1)
 
-# Instantiate the new OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-# Definitions of the OpenAI functions for function‐calling
 FUNCTIONS = [
     {
         "name": "remove_objects",
@@ -83,7 +67,6 @@ FUNCTIONS = [
     }
 ]
 
-# System prompt instructing GPT-4 how to behave
 SYSTEM_PROMPT = """
 You are an assistant that edits a CSV file of detected objects. The CSV has a column named "object", 
 and each row corresponds to one detected object. The user will issue free-form instructions like 
@@ -117,14 +100,12 @@ class CsvChatManagerNode(Node):
     def __init__(self):
         super().__init__('object_review_llm')
 
-        # Declare a parameter 'csv_path'; default is a placeholder
         self.declare_parameter(
             'csv_path',
             '/home/shawn/Documents/spot/robot_suite_v2/detected_objects.csv'
         )
         self.csv_path = self.get_parameter('csv_path').value
 
-        # Verify API key again within ROS 2 context
         if not OPENAI_API_KEY:
             self.get_logger().error("OPENAI_API_KEY not set in environment/.env. Shutting down.")
             rclpy.shutdown()
@@ -132,10 +113,8 @@ class CsvChatManagerNode(Node):
 
         self.get_logger().info(f"CSV Chat Manager initialized with CSV: {self.csv_path}")
 
-        # Start the interactive chat loop (this blocks until user types 'exit' or 'quit')
         self.run_chat_loop()
 
-    # Read the current CSV into a DataFrame
     def read_csv(self):
         try:
             df = pd.read_csv(self.csv_path)
@@ -144,14 +123,12 @@ class CsvChatManagerNode(Node):
             df = pd.DataFrame(columns=['object'])
         return df
 
-    # Overwrite the CSV with the given DataFrame
     def write_csv(self, df: pd.DataFrame):
         try:
             df.to_csv(self.csv_path, index=False)
         except Exception as e:
             self.get_logger().error(f"Failed to write CSV at {self.csv_path}: {e}")
 
-    # Helper to call OpenAI's new ChatCompletion API
     def call_openai(self, messages, functions=None, function_call="auto"):
         call_kwargs = {
             "model": "gpt-4-turbo",
@@ -161,12 +138,9 @@ class CsvChatManagerNode(Node):
             call_kwargs["functions"] = functions
             call_kwargs["function_call"] = function_call
 
-        # Use the new client API: client.chat.completions.create(…)
         response = client.chat.completions.create(**call_kwargs)
-        # Return the single 'message' object from the first choice
         return response.choices[0].message
 
-    # Execute one of the defined functions on the CSV, returning a result dict
     def execute_function_call(self, func_name, arguments):
         df = self.read_csv()
         result = {}
@@ -191,7 +165,6 @@ class CsvChatManagerNode(Node):
 
         elif func_name == "add_object":
             new_name = arguments.get("object_name", "")
-            # Keep existing columns; fill them with blank for the new row
             columns = df.columns.tolist()
             new_row = {col: "" for col in columns}
             new_row["object"] = new_name
@@ -204,56 +177,47 @@ class CsvChatManagerNode(Node):
 
         return result
 
-    # Start an interactive chat loop. This will block until the user types 'exit' or 'quit'.
     def run_chat_loop(self):
         print("=== CSV Chat Manager (ROS2 Node) ===")
         print("Type 'exit' or 'quit' to end the session.\n")
 
-        # Initialize conversation history
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT}
         ]
 
-        # Let the assistant ask the opening question
         assistant_msg = self.call_openai(
             messages,
             functions=FUNCTIONS,
             function_call="none"
         )
-        # Access content via attribute
+
         if assistant_msg.content:
             print("Assistant:", assistant_msg.content.strip())
             messages.append({"role": "assistant", "content": assistant_msg.content})
 
-        # Main loop
         while rclpy.ok():
             try:
                 user_input = input("You: ").strip()
             except EOFError:
-                # Terminal closed unexpectedly
                 break
 
             if user_input.lower() in ["exit", "quit"]:
                 print("Exiting chat. Goodbye!")
                 break
 
-            # Append the user's message
             messages.append({"role": "user", "content": user_input})
 
-            # Let the model decide if it wants to call a function
             assistant_msg = self.call_openai(
                 messages,
                 functions=FUNCTIONS,
                 function_call="auto"
             )
 
-            # If the assistant returns plain content (no function_call), it's a follow-up
             if assistant_msg.content and assistant_msg.function_call is None:
                 print("Assistant:", assistant_msg.content.strip())
                 messages.append({"role": "assistant", "content": assistant_msg.content})
                 continue
 
-            # If the assistant wants to call a function:
             if assistant_msg.function_call:
                 func_name = assistant_msg.function_call.name
                 raw_args = assistant_msg.function_call.arguments or "{}"
@@ -261,15 +225,13 @@ class CsvChatManagerNode(Node):
                 try:
                     arguments = json.loads(raw_args)
                 except json.JSONDecodeError:
-                    # Malformed JSON: ask the assistant to clarify
                     print("Assistant attempted a function call but provided invalid JSON.")
                     print("Raw arguments:", raw_args)
                     messages.append({"role": "assistant", "content": "<malformed function_call>"})
                     continue
 
-                # Execute the function on the CSV
                 func_result = self.execute_function_call(func_name, arguments)
-                # Append the assistant's function_call message to history
+
                 messages.append({
                     "role": "assistant",
                     "content": None,
@@ -279,7 +241,6 @@ class CsvChatManagerNode(Node):
                     }
                 })
 
-                # Create a "function" role message with the result
                 func_result_msg = {
                     "role": "function",
                     "name": func_name,
@@ -287,32 +248,26 @@ class CsvChatManagerNode(Node):
                 }
                 messages.append(func_result_msg)
 
-                # Let the model produce a final acknowledgement
                 final_ack = self.call_openai(messages)
                 if final_ack.content:
                     print("Assistant:", final_ack.content.strip())
                     messages.append({"role": "assistant", "content": final_ack.content})
 
-                # Continue waiting for the next user input
                 continue
 
-            # If something unexpected occurs:
             print("Assistant (unexpected response):", assistant_msg)
             messages.append({"role": "assistant", "content": "<unexpected response>"})
 
-        # After exiting the loop, shut down the node
         rclpy.shutdown()
-
 
 def main(args=None):
     rclpy.init(args=args)
     node = CsvChatManagerNode()
-    # The chat loop runs inside the node's __init__, blocking until exit.
+    
     try:
         node.destroy_node()
     except Exception:
         pass
-
 
 if __name__ == "__main__":
     main()

@@ -13,7 +13,6 @@ class SitAction(Action):
 
         self.sit_client = self.create_client(Trigger, "/byte/sit")
 
-    # ----------------------------------------------------------------
     def update(self) -> py_trees.common.Status:
         try:
             self.sit_client.call_async(Trigger.Request())
