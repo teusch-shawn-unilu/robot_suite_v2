@@ -8,7 +8,6 @@ from rclpy.node import Node
 from std_srvs.srv import Trigger
 from geometry_msgs.msg import Twist
 from hand_gestures_msgs.msg import Landmarks
-# from bosdyn.client.frame_helpers import GRAV_ALIGNED_BODY_FRAME_NAME, ODOM_FRAME_NAME
 # from spot_msgs.action import RobotCommand
 # from .simple_spot_commander import SimpleSpotCommander
 
