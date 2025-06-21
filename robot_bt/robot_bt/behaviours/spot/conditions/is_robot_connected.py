@@ -6,7 +6,7 @@ class IsRobotConnected(py_trees.behaviour.Behaviour):
     """
     Checks if the Spot robot is reachable via ping.
     """
-    _ip_address: str = "192.168.80.3"  # TODO: set Spot’s actual IP
+    _ip_address: str = "192.168.80.3" 
 
     def setup(self):
         pass

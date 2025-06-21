@@ -13,9 +13,7 @@ class BootstrapError(Exception):
     pass
 
 
-def bootstrap_bt(
-    file_name: str, module_name: Optional[str] = None
-) -> Callable[[Node], py_trees.behaviour.Behaviour]:
+def bootstrap_bt(file_name: str, module_name: Optional[str] = None) -> Callable[[Node], py_trees.behaviour.Behaviour]:
     """
     Dynamically imports a module and retrieves the `bootstrap` function for a behavior tree.
 

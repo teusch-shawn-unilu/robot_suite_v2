@@ -11,9 +11,8 @@ class SitAction(Action):
     def __init__(self, node: rclpy.node.Node, name: str = "SitAction"):
         super().__init__(node, name)
 
-        self.sit_client = self.create_client(Trigger, "/sit")
+        self.sit_client = self.create_client(Trigger, "/byte/sit")
 
-    # ----------------------------------------------------------------
     def update(self) -> py_trees.common.Status:
         try:
             self.sit_client.call_async(Trigger.Request())

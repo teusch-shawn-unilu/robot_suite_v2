@@ -8,7 +8,7 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
-def create_spot_driver_launch(ld: LaunchDescription) -> None:
+def create_spot_driver_launch(ld: LaunchDescription, pkg_dir: str) -> None:
     spot_driver_pkg_dir = get_package_share_directory("spot_driver")
 
     ld.add_action(
@@ -16,23 +16,23 @@ def create_spot_driver_launch(ld: LaunchDescription) -> None:
             PythonLaunchDescriptionSource(
                 os.path.join(spot_driver_pkg_dir, "launch/spot_driver.launch.py")
             ),
+            launch_arguments={"config_file": os.path.join(pkg_dir, "config/spot_driver_params.yaml")}.items()
         )
     )
 
+def create_object_recognition_launch(ld: LaunchDescription) -> None:
+    ld.add_action(Node(package="spot_object_recognition", executable="spot_object_recognition_node", output="screen"))
+
+def create_object_review_llm_launch(ld: LaunchDescription) -> None:
+    ld.add_action(Node(package="object_review_llm", executable="object_review_llm", output="screen"))
 
 def create_robot_bt_launch(ld: LaunchDescription) -> None:
-    ld.add_action(Node(package="robot_bt", executable="bt_server", output="screen"))
-
-
-def create_tello_control_station_launch(ld: LaunchDescription) -> None:
     ld.add_action(
         Node(
-            package="tello_control_station",
-            executable="control_station",
-            output="screen",
-        )
+            package="robot_bt",
+            executable="bt_server",
+            output="screen")        
     )
-
 
 def create_hand_tracker_plugin_launch(ld: LaunchDescription) -> None:
     pkg_dir = get_package_share_directory("robot_bringup")
@@ -50,18 +50,15 @@ def create_hand_tracker_plugin_launch(ld: LaunchDescription) -> None:
         )
     )
 
-
 def generate_launch_description():
     ld = LaunchDescription()
-
-    create_spot_driver_launch(ld)
+    
+    pkg_dir = get_package_share_directory("robot_bringup")
+    
+    create_spot_driver_launch(ld, pkg_dir)
     create_robot_bt_launch(ld)
-    create_tello_control_station_launch(ld)
-
-    # ------------------
-    # -    Plugins     -
-    # ------------------
-
-    create_hand_tracker_plugin_launch(ld)
-
+    
+    create_object_recognition_launch(ld)
+    create_object_review_llm_launch(ld)
+    
     return ld
